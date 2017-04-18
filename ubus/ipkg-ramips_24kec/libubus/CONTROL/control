@@ -1,0 +1,13 @@
+Package: libubus
+Version: 2014-07-03-f688c7ad0b2435a89bfd13f5496cabf596b54c8f
+Depends: libc, libubox
+Provides: 
+Source: package/ubus
+Section: libs
+Status: unknown ok not-installed
+Essential: no
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: ramips_24kec
+Installed-Size: 16211
+Description:  OpenWrt RPC client library

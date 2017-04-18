@@ -1,0 +1,30 @@
+CC=gcc
+CFLAGS+=-ldl -I../include 
+#SOURCES:=$(wildcard *.c)
+SOURCES:=main.c avlTree.c
+OBJS:=$(patsubst %.c,%.o,$(SOURCES)) 
+
+wips: $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) -o wips
+
+$(OBJS):%.o:%.c
+	$(CC) -c $(CFLAGS) $< -o $@
+#%.d:%.c
+#	@set -e ; rm -f $@; \
+#	$(CC) -MM $(CFLAGS) $< >;
+
+include $(SOURCES:.c=.d)
+
+%d:%c
+	@set -e;rm -f $@;\ 
+	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ ,g' < $@.$$$$ > $@; \  
+	rm -f $@.$$$$
+
+
+.PHONY: clean
+clean:
+	-rm wips $(OBJS)
+	-rm *.d
+	-rm *.d.*
+
