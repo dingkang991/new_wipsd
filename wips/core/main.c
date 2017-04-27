@@ -18,8 +18,34 @@ void ctxInit()
 {
 	memset(&ctx,0,sizeof(ctx));
 	INIT_LIST_HEAD(&ctx.libEventList);
-	INIT_LIST_HEAD(&ctx.pBeaconList);
+	INIT_LIST_HEAD(&ctx.pAllManageMentFrameList);
+	INIT_LIST_HEAD(&ctx.pAssocationRequestList);
+	INIT_LIST_HEAD(&ctx.pAssocationResponseList);
+	INIT_LIST_HEAD(&ctx.pReassocationRequestList);
+	INIT_LIST_HEAD(&ctx.pReassocationResponseList);
+	INIT_LIST_HEAD(&ctx.pReassocationResponseList);
+	INIT_LIST_HEAD(&ctx.pProbeRequestList);
+	INIT_LIST_HEAD(&ctx.pProbeResponseList);
+	INIT_LIST_HEAD(&ctx.pATIMList);
+	INIT_LIST_HEAD(&ctx.pDisassociationList);
+	INIT_LIST_HEAD(&ctx.pAuthenticationList);
+	INIT_LIST_HEAD(&ctx.pDeauthenicationList);
+	INIT_LIST_HEAD(&ctx.pAllControlFrameList);
+	INIT_LIST_HEAD(&ctx.pPowerSaveList);
+	INIT_LIST_HEAD(&ctx.pRTSList);
+	INIT_LIST_HEAD(&ctx.pCTSList);
+	INIT_LIST_HEAD(&ctx.pACKList);
+	INIT_LIST_HEAD(&ctx.pCFEndList);
+	INIT_LIST_HEAD(&ctx.pCFEndACKList);
 	INIT_LIST_HEAD(&ctx.pDataList);
+	INIT_LIST_HEAD(&ctx.wNodeBSS);
+	INIT_LIST_HEAD(&ctx.wNodeSta);
+
+	if ((ctx.wNodeAllHash = hash_new()) == NULL){
+		log_error("hash_new failed");
+		return -1;
+	}
+	
 	memset(&ctx.memTotal,0,sizeof(wNodeMem_t));
 	memset(ctx.memMap,0,(sizeof(wNodeMemMap_t)*MODULE_MAX));
 	ctx.memTotal.memMap = ctx.memMap;
@@ -279,14 +305,30 @@ core2EventLib_t* core2EventLibInit(core2EventLib_t* core2EventLib,eventLibLinkIn
 	tmp->eventMemCore = &eventLibInfo->eventLibInfo.eventMem;
 	if(tmp->wNode != NULL)
 	{
-		tmp->payLoadLen = tmp->wNode->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memLen;
-		if(tmp->payLoadLen != 0)
-			tmp->payLoad = tmp->wNode->memInfo.memStart + tmp->wNode->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memOffset;
+		tmp->wNode->memPayload2LibEventLen = tmp->wNode->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memLen;
+		if(tmp->wNode->memPayload2LibEventLen != 0)
+			tmp->wNode->memPayload2LibEvent = tmp->wNode->memInfo.memStart + tmp->wNode->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memOffset;
 		else
-			tmp->payLoad = NULL;
-	}else{
-		tmp->payLoadLen = 0;
-		tmp->payLoad = 0;
+			tmp->wNode->memPayload2LibEvent = NULL;
+	}
+
+	if(tmp->wNodeSta != NULL)
+	{
+		tmp->wNodeSta->memPayload2LibEventLen = tmp->wNodeSta->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memLen;
+		if(tmp->wNodeSta->memPayload2LibEventLen != 0)
+			tmp->wNodeSta->memPayload2LibEvent = tmp->wNodeSta->memInfo.memStart + tmp->wNodeSta->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memOffset;
+		else
+			tmp->wNodeSta->memPayload2LibEvent = NULL;
+	}
+
+	
+	if(tmp->wNodeBssid != NULL)
+	{
+		tmp->wNodeBssid->memPayload2LibEventLen = tmp->wNodeBssid->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memLen;
+		if(tmp->wNodeSta->memPayload2LibEventLen != 0)
+			tmp->wNodeBssid->memPayload2LibEvent = tmp->wNodeBssid->memInfo.memStart + tmp->wNodeBssid->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memOffset;
+		else
+			tmp->wNodeBssid->memPayload2LibEvent = NULL;
 	}
 	return tmp;
 }

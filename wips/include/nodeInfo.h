@@ -60,6 +60,9 @@ typedef struct w_node
 	__u8 essid_id[ETH_ALEN];//MAC
 	__u8 ssid_len;//ssid_len_FN
 	wNodeMem_t memInfo;
+	void* memPayload2LibEvent;
+	int memPayload2LibEventLen;
+	
 	proberInfo_t proberInfo;
 
 }wNode_t;

@@ -15,9 +15,32 @@
 
 
 struct wipsContext{
-	struct list_head libEventList;
+	struct list_head libEventList;	
+	struct list_head pAllManageMentFrameList;
+	struct list_head pAssocationRequestList;
+	struct list_head pAssocationResponseList;
+	struct list_head pReassocationRequestList;
+	struct list_head pReassocationResponseList;
+	struct list_head pProbeRequestList;
+	struct list_head pProbeResponseList;
 	struct list_head pBeaconList;
+	struct list_head pATIMList;
+	struct list_head pDisassociationList;
+	struct list_head pAuthenticationList;
+	struct list_head pDeauthenicationList;
+	struct list_head pAllControlFrameList;
+	struct list_head pPowerSaveList;
+	struct list_head pRTSList;
+	struct list_head pCTSList;
+	struct list_head pACKList;
+	struct list_head pCFEndList;
+	struct list_head pCFEndACKList;
 	struct list_head pDataList;
+	/*****wnode list******/
+	struct list_head wNodeBSS;
+	struct list_head wNodeSta;
+	
+	struct hash_control *wNodeAllHash;
 	wNodeMem_t memTotal;
 	wNodeMemMap_t memMap[MODULE_MAX];
 	int memMapOffset;

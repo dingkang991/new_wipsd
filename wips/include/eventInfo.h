@@ -45,7 +45,28 @@ typedef struct eventLibWnodeMemInfo_s{
 
 typedef struct eventCB_s{
 	void (*eventCBInit)();
-	void (*pBeaconCB)(void*);
+	/***********Management Frame(type 00)***********/
+	void (*pAllManagementFrameCB)(void*); 
+	void (*pAssocationRequestCB)(void*);//0000
+	void (*pAssocationResponseCB)(void*);//0001
+	void (*pReassocationRequestCB)(void*);//0010
+	void (*pReassocationResponseCB)(void*);//0011
+	void (*pProbeRequestCB)(void*);//0100
+	void (*pProbeResponseCB)(void*);//0101
+	void (*pBeaconCB)(void*);//1000
+	void (*pATIMCB)(void*);//1001
+	void (*pDisassociationCB)(void*);//1010
+	void (*pAuthenticationCB)(void*);//1011
+	void (*pDeauthenicationCB)(void*);//1100
+	/*********Control Frame(type 01)***********/
+	void (*pAllControlFrameCB)(void*);
+	void (*pPowerSaveCB)(void*);//1010
+	void (*pRTSCB)(void*);//1011
+	void (*pCTSCB)(void*);//1100
+	void (*pACKCB)(void*);//1101
+	void (*pCFEndCB)(void*);//1110
+	void (*pCFEndACKCB)(void*);//1111
+	/*********Data Frame(type 10)************/
 	void (*pDataCB)(void*);
 }eventCB_t;
 
@@ -74,12 +95,14 @@ typedef struct core2EventLib_s{
 	eventLibMemInfo_t* eventMemCore;
 	#if 1
 	wNode_t* wNode;
-	wNodeMem_t* payLoad;
+	wNode_t* wNodeSta;
+	wNode_t* wNodeBssid;
 	#else
 	void* wNode;
 	void* payLoad;
 	#endif
-	int payLoadLen;
+	struct ieee80211_frame *wh
+	int whLen;
 }core2EventLib_t;
 
 #define INIT_CORE2EVENTLIB_TMP(_name) \
