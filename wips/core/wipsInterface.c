@@ -108,35 +108,51 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 			switch(subtype){
 				case IEEE80211_FC0_SUBTYPE_ASSOC_REQ:
 					log_info("WLAN_FC02_STYPE_ASSOC_REQ:\n");
+					bssid = wh->i_addr3;
+					sta = wh->i_addr2;
 					handleAllCB(&ctx.pAssocationRequestList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_ASSOC_RESP:
 					log_info("WLAN_FC02_STYPE_ASSOC_RESP:\n");
+					sta = wh->i_addr1;
+					bssid = wh->i_addr3;
 					handleAllCB(&ctx.pAssocationResponseList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_REASSOC_REQ:
 					log_info("WLAN_FC02_STYPE_REASSOC_REQ:\n");
+					sta = wh->i_addr2;
+					bssid = wh->i_addr3;
 					handleAllCB(&ctx.pReassocationRequestList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_REASSOC_RESP:
 					log_info("WLAN_FC02_STYPE_REASSOC_RESP:\n");
+					sta = wh->i_addr1;
+					bssid = wh->iaddr3;
 					handleAllCB(&ctx.pReassocationResponseList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_PROBE_REQ:
 					log_info("WLAN_FC02_STYPE_PROBE_REQ:\n");
+					sta = wh->i_addr2;
+					bssid = NULL;
 					handleAllCB(&ctx.pProbeRequestList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_PROBE_RESP:
+					log_info("IEEE80211_FC0_SUBTYPE_PROBE_RESP");
+					sta = wh->i_addr1;
+					bssid = wh->i_addr2;
 					handleAllCB(&ctx.pProbeResponseList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_BEACON:
 					log_info("WLAN_FC02_STYPE_BEACON:\n");
+					sta = NULL;
+					bssid = wh->i_addr3;
 					handleAllCB(&ctx.pBeaconList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_ATIM:
-					handleAllCB(&ctx.pATIMList,core2EventLib);
+				//	handleAllCB(&ctx.pATIMList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_DISASSOC:
+					bssid = wh->i_addr3;
 					handleAllCB(&ctx.pDisassociationList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_AUTH:

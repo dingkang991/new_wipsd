@@ -39,8 +39,10 @@ typedef struct proberInfo_s{
 typedef struct w_node
 {
 	__u8 mac[ETH_ALEN];//MAC
+	__u8 peer_mac[ETH_ALEN];
 	char vendor[128];
 	char sec_type[48];//WPA/RSN parameters
+	char 
 	char ssid[SSID_BUFSIZE_D];//ssid
 	
 //	time_t up_time;

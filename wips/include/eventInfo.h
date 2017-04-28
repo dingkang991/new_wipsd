@@ -111,6 +111,8 @@ typedef struct core2EventLib_s{
 	eventLibMemInfo_t eventMemCoreTmp_##_name;\
 	wNode_t wNodeTmp_##_name;\
 	wNodeMem_t wNodeMemTmp_##_name;\
+	_name.wNodeBssid = NULL;\
+	_name.wNodeSta = NULL;\
 	_name.eventInfoCore = &eventLibLinkInfoTmp_##_name;\
 	_name.eventMemCore = &eventMemCoreTmp_##_name;\
 	_name.wNode = &wNodeTmp_##_name;\
