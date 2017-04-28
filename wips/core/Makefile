@@ -3,7 +3,7 @@ CFLAGS  += -rdynamic -DMAGIC_CH=abdd
 INCLUDEFLAGS += -I../include -I../../libubox
 LDPATH += -L../ -L../../libubox
 LDFLAGS += -ldl -lwips -lubox
-OBJS    = main.o wNode.o wipsInterface.o wipsd_parse.o time.o
+OBJS    = main.o wNode.o wipsInterface.o wipsd_parse.o time.o confread.o
 TARGETS = wips 
 
 #.PHONY:all 

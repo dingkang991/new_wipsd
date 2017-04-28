@@ -46,6 +46,7 @@ struct wipsContext{
 	int memMapOffset;
 	wipsInterface_t wipsInterface;
 	unsigned long packetCounter;
+	struct confread_file *configFile;
 };
 
 extern core2EventLib_t* core2EventLibInit(core2EventLib_t* core2EventLib,eventLibLinkInfo_t* eventLibInfo);

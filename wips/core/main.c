@@ -5,6 +5,7 @@
 #include "main.h"
 #include "nodeInfo.h"
 #include "wipsInterface.h"
+#include "confread.h"
 
 int logType1= 0xffffffff;
 int logType2= 0xffffffff;
@@ -26,6 +27,7 @@ void ctxInit()
 	INIT_LIST_HEAD(&ctx.pReassocationResponseList);
 	INIT_LIST_HEAD(&ctx.pProbeRequestList);
 	INIT_LIST_HEAD(&ctx.pProbeResponseList);
+	INIT_LIST_HEAD(&ctx.pBeaconList);
 	INIT_LIST_HEAD(&ctx.pATIMList);
 	INIT_LIST_HEAD(&ctx.pDisassociationList);
 	INIT_LIST_HEAD(&ctx.pAuthenticationList);
@@ -230,7 +232,7 @@ eventLibLinkInfo_t* insmodModule(char* path)
 		return -2;
 	}
 	eventLibInfoTmp=(eventLibInfo_t*)func();
-	eventLibLinkInfoTmp->initCBFun=func();
+	eventLibLinkInfoTmp->initCBFun=func;
 	memcpy(&eventLibLinkInfoTmp->eventLibInfo,eventLibInfoTmp,sizeof(eventLibInfo_t));
 	
 	//log_debug("get event lib name:%s\n",eventLibLinkInfoTmp->eventLibInfo.eventLibName);
@@ -261,7 +263,6 @@ void handleAllCB(struct list_head* CBList,core2EventLib_t *CBParam)
 	
 	list_for_each(tmp,CBList)
 	{
-		
 		funcCBTmp = list_entry(tmp,funcCB_t,list);
 		
 		if(funcCBTmp && funcCBTmp->func)
@@ -336,11 +337,101 @@ core2EventLib_t* core2EventLibInit(core2EventLib_t* core2EventLib,eventLibLinkIn
 
 MM_STATS(CORE_ID);
 
+
+void loadBaseConfig()
+{
+	struct confread_section* root=NULL;
+	char* configValue = NULL;
+	if(ctx.configFile == NULL)
+	{
+		log_error("config File is NULL,can not load base config\n");
+		return;
+	}
+
+	root = confread_find_section(ctx.configFile,"root");
+
+	/*****logtype1******/
+	configValue = confread_find_value(root,"logType1");
+	if(configValue == NULL)
+	{
+		log_error("can not load config key(%s) ,load default 0xffffffff\n","logtype1");
+		logType1 = 0xffffffff;
+	}else{
+		log_info("find key(%s),value(%s)\n","logType1",configValue);
+		sscanf(configValue,"%x",&logType1);
+		//logType1 = atoi(configValue);
+	}
+
+	/*****logtype2******/
+	configValue = confread_find_value(root,"logType2");
+	if(configValue == NULL)
+	{
+		log_error("can not load config key(%s) ,load default 0xffffffff\n","logtype2");
+		logType1 = 0xffffffff;
+	}else{
+		log_info("find key(%s),value(%s)\n","logType2",configValue);
+		sscanf(configValue,"%d",&logType2);
+	}
+
+	/*****logLevel******/
+	configValue = confread_find_value(root,"logLevel");
+	if(configValue == NULL)
+	{
+		log_error("can not load config key(%s) ,load default 3\n","logLevel");
+		logType1 = 0xffffffff;
+	}else{
+		log_info("find key(%s),value(%s)\n","logLevel",configValue);
+		sscanf(configValue,"%d",&logLevel);
+	}
+
+	return;
+}
+
+void loadAllModules()
+{
+	struct confread_section *thisSect = NULL;
+	
+	struct confread_pair *thisPair = 0;
+	if(ctx.configFile == NULL)
+	{
+		log_error("config file is NULL\n");
+		return;
+	}
+	
+	thisSect = ctx.configFile->sections;
+
+	while (thisSect) {
+		int ret = 0;
+		log_info("load wips module[%s]\n",thisSect->name);
+		
+		ret = insmodModule(thisSect->name);
+
+		if(ret != 0)
+		{
+			log_error("insmod module[%s] error ,pls check\n",thisSect->name);
+		}else{
+			log_info("insmode module[%s] success\n",thisSect->name);
+		}
+		thisPair = thisSect->pairs;
+
+		while (thisPair) {
+
+//			printf("%s = %s\n", thisPair->key, thisPair->value);
+			thisPair = thisPair->next;
+
+		}
+		thisSect = thisSect->next;
+
+	}
+}
+
 void main(int argc ,char** argv)
 {
 	int ch;
 	opterr = 0;
-	while((ch = getopt(argc, argv, "a:b:l:")) != -1)
+	
+	ctxInit();
+	while((ch = getopt(argc, argv, "a:b:l:f:")) != -1)
 	switch(ch)
 	{
 		case 'a':
@@ -355,10 +446,20 @@ void main(int argc ,char** argv)
 			log_debug("option l:'%s'\n",optarg);
 			logLevel=atoi(optarg);
 			break;
+		case 'f':
+			log_debug("read config file:'%s'\n",optarg);
+			if (!(ctx.configFile = confread_open(optarg))) {
+					log_error("Config(%s) open failed\n",optarg);
+					return -1;
+			}
+			loadBaseConfig();
+			loadAllModules();
+			
+			break;
 		default:
 			printf("other option :%c\n", ch);
 	}
-	inorder_avltree(NULL);
+//	inorder_avltree(NULL);
 
 	/*
 	printf("logType:%d\n",logType1);
@@ -370,12 +471,13 @@ void main(int argc ,char** argv)
 	log_debug("logLevel:%x\n",logLevel);
 */
 	eventLibLinkInfo_t* tmp;
-	uloop_init();
-	ctxInit();
+	uloop_init();/*
 	insmodModule("./libtest.so");
 	insmodModule("./libtest2.so");
-
+*/
 	log_error("----------------split beacom-----------------\n");
+	
+
 	wNode_t* tmpWnode = initWnode(NULL);
 	core2EventLib_t pBeacon,pData;
 	snprintf(pBeacon.tmpInfo,128,"Beacon packet will comming");
