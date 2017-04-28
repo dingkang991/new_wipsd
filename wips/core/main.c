@@ -156,6 +156,7 @@ int parseWnodeInfo2CTX(eventLibLinkInfo_t* tmp)
 		return 0;
 	}
 	log_info("module[%s] regist wnode mem %d to mem map ofset:%d \n",tmp->eventLibInfo.eventLibName,tmp->eventLibInfo.wnodeMem.wnodeMemInitLen,ctx.memMapOffset);
+	ctx.memMap[tmp->eventLibInfo.eventInfo.eventId].module = tmp;
 	ctx.memMap[tmp->eventLibInfo.eventInfo.eventId].memLen = tmp->eventLibInfo.wnodeMem.wnodeMemInitLen;
 	ctx.memMap[tmp->eventLibInfo.eventInfo.eventId].memOffset = ctx.memMapOffset;
 	ctx.memMapOffset += tmp->eventLibInfo.wnodeMem.wnodeMemInitLen;

@@ -8,6 +8,7 @@
 wNode_t* initWnode(wNode_t* node)
 {
 	wNode_t* tmp = NULL;
+	int i = 0;
 	if(node == NULL)
 	{
 		tmp = (wNode_t*) MM_MALLOC(CORE_ID,sizeof(wNode_t));
@@ -26,7 +27,14 @@ wNode_t* initWnode(wNode_t* node)
 	tmp->memInfo.memLen = ctx.memTotal.memLen;
 	tmp->memInfo.memMap = ctx.memMap;
 	memset(tmp->memInfo.memStart,0,tmp->memInfo.memLen);
-
+	for(i = 0 ;i <MODULE_MAX;i++)
+	{
+		wNodeMemMap_t* libModule = (eventLibLinkInfo_t*)&ctx.memMap[i];
+		eventLibLinkInfo_t* module = (eventLibLinkInfo_t*) libModule->module;
+		if(module->eventLibInfo.wnodeMem.wNodeMemInitCB != NULL)
+			module->eventLibInfo.wnodeMem.wNodeMemInitCB((void*)tmp->memInfo.memStart+libModule->memOffset,libModule->memLen);
+	}
+		
 	node->initFlag = 1;
 	setTimeNow(&node->upTime);
 //	setTimeNow(&node->lastTime);
@@ -35,14 +43,23 @@ wNode_t* initWnode(wNode_t* node)
 
 }
 
-int distroyWnode(wNode_t* node,int is_free)
+int destroyWnode(wNode_t* node,int is_free)
 {
-
+	int i = 0;
 	if (node == NULL)
 	{
 		log_error("distroyWnode error , node is NULL\n");
 		return -1;
 	}
+	
+	for(i = 0 ;i <MODULE_MAX;i++)
+	{
+		wNodeMemMap_t* libModule = (eventLibLinkInfo_t*)&ctx.memMap[i];
+		eventLibLinkInfo_t* module = (eventLibLinkInfo_t*) libModule->module;
+		if(module->eventLibInfo.wnodeMem.wNodeMemDestroyCB != NULL)
+			module->eventLibInfo.wnodeMem.wNodeMemDestroyCB((void*)node->memInfo.memStart+libModule->memOffset,libModule->memLen);
+	}
+	
 
 	MM_FREE(CORE_ID,node->memInfo.memStart);
 

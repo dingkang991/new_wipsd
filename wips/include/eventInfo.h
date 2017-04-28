@@ -37,6 +37,8 @@ typedef struct eventLibMemInfo_s{
 
 typedef struct eventLibWnodeMemInfo_s{
 	int wnodeMemInitLen;
+	void (*wNodeMemInitCB)(void*,int);
+	void (*wNodeMemDestroyCB)(void*,int);
 //	int wnodeMemLen;
 //	void* WnodeMemStart;
 }eventLibWnodeMemInfo_t;

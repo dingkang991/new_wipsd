@@ -15,7 +15,7 @@
 
 typedef struct wNodeMemMap_s{
 	//eventLibLinkInfo_t *module;
-	void* module;
+	void* module;//eventLibLinkInfo_t*
 	int memOffset;
 	int memLen;
 }wNodeMemMap_t;
