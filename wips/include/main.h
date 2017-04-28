@@ -39,8 +39,8 @@ struct wipsContext{
 	/*****wnode list******/
 	struct list_head wNodeBSS;
 	struct list_head wNodeSta;
-	
 	struct hash_control *wNodeAllHash;
+	time_t timeNow;
 	wNodeMem_t memTotal;
 	wNodeMemMap_t memMap[MODULE_MAX];
 	int memMapOffset;

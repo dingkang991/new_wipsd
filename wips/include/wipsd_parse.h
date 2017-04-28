@@ -382,8 +382,8 @@ int wipsd_ieee80211_radiotap_iterator_next(struct ieee80211_radiotap_iterator *i
 int wipsd_ieee80211_packet_radiotap(unsigned char *buff, u32 *len);
 int wipsd_ieee80211_packet_prism(unsigned char *buff, u32 *len);
 int wipsd_ieee80211_radiotap_parse(u8 *buf, int buflen,
-											struct w_node *value);
-int wipsd_ieee80211_prism_parse(u8 *buff, struct w_node *value);
+											 radioInfo_t *value);
+int wipsd_ieee80211_prism_parse(u8 *buff,  radioInfo_t *value);
 
 #endif /* __RADIOTAP_ITER_H */
 

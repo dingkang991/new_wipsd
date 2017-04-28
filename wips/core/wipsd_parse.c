@@ -267,7 +267,7 @@ int wipsd_ieee80211_packet_prism(unsigned char *buff, u32 *len)
 	return (phdr->msgcode == 0x00000044);
 }
 
-int wipsd_ieee80211_prism_parse(u8 *buff, struct w_node *value)
+int wipsd_ieee80211_prism_parse(u8 *buff, radioInfo_t *value)
 {
 	wlan_ng_prism2_header *phdr = NULL;
 
@@ -291,7 +291,7 @@ int wipsd_ieee80211_prism_parse(u8 *buff, struct w_node *value)
 }
 
 int wipsd_ieee80211_radiotap_parse(u8 *buf, int buflen,
-											struct w_node *value)
+											radioInfo_t *value)
 {
 	int ret = 0;
 	int freq = 0;

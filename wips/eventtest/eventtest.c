@@ -107,30 +107,7 @@ void* initTest(void)
 
 void* pBeaconTest(core2EventLib_t* tmp)
 {
-//	log_debug("get Beacon info form core to libeventis :%s\n",tmp->tmpInfo);
-	//log_debug("get beacon info form core to self:%s %s %d\n",tmp->eventInfoCore->eventLibAbsPath,\
-														tmp->eventInfoCore->eventLibInfo.eventInfo.eventName,\
-														tmp->eventInfoCore->eventLibInfo.eventInfo.eventId);
-	//log_debug("get mem info form core is :%s point:%p\n",USER_MEM(tmp),\
-	//														USER_MEM(tmp));
-	//strcpy(USER_MEM(tmp),"[at libtest.so test str]");
-	
-	//log_debug("get mem info form core is :%s point:%p\n",USER_MEM(tmp),\
-														USER_MEM(tmp));
-														
-	log_debug("get wnode mem payload:%p,len:%d\n",tmp->payLoad,tmp->payLoadLen);
-	/*char *tmp_s = NULL;
-	int k;
-	log_debug("___------malloc 150 mem test\n");
-	for(k = 0 ;k < 150 ;k++)
-	{
-		tmp_s = MM_CALLOC(LIBEVENT_TEST_ID,1,10);
-		if(k%3 == 0)
-			MM_FREE(LIBEVENT_TEST_ID,tmp_s);
-	}
-	
-	log_debug("___------malloc 150 mem over \n");
-					*/								
+											
 	return NULL;
 }
 

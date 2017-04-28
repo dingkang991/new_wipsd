@@ -1,7 +1,106 @@
 #include "wipsInterface.h"
 #include "memory.h"
 #include "main.h"
+#include "ieee80211.h"
+const u_int8_t	  addrBcast[IEEE80211_ADDR_LEN]={0xff,0xff,0xff,0xff,0xff,0xff};
 
+void syncBssidAndStaInfo(core2EventLib_t* core2EventLib)
+{
+	if(core2EventLib->wNodeSta != NULL)
+	{
+		memcpy(&core2EventLib->wNodeSta->proberInfo,&core2EventLib->proberInfo,sizeof(proberInfo_t));
+		memcpy(&core2EventLib->wNodeSta->radioInfo,&core2EventLib->radioInfo,sizeof(radioInfo_t));
+		setTimeNow(&core2EventLib->wNodeSta->lastTime);
+		core2EventLib->wNodeSta->initFlag = 0;
+	}
+
+	if(core2EventLib->wNodeBssid != NULL)
+	{
+		memcpy(&core2EventLib->wNodeBssid->proberInfo,&core2EventLib->proberInfo,sizeof(proberInfo_t));
+		memcpy(&core2EventLib->wNodeBssid->radioInfo,&core2EventLib->radioInfo,sizeof(radioInfo_t));
+		setTimeNow(&core2EventLib->wNodeBssid->lastTime);
+		core2EventLib->wNodeBssid->initFlag = 0;
+	}
+	
+}
+void findBssidAndSta(core2EventLib_t* core2EventLib,u_int8_t* bssid,u_int8_t* sta)
+{
+	wNode_t* wNodeTmp=NULL;
+
+	if(core2EventLib == NULL)
+	{
+		log_error("parms is NULL\n");
+		return;
+	}
+
+	if(bssid == NULL || IEEE80211_ADDR_EQ(addrBcast,bssid))
+	{
+		core2EventLib->wNodeBssid = NULL;
+	}else{
+		wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char *)bssid, ETH_ALEN);
+		if(wNodeTmp != NULL){
+			core2EventLib->wNodeBssid = wNodeTmp;
+		}else{
+			core2EventLib->wNodeBssid = initWnode(NULL);
+			memcpy(core2EventLib->wNodeBssid->mac,bssid,ETH_ALEN);
+			hash_insert(ctx.wNodeAllHash,(const char*)core2EventLib->wNodeBssid->mac,ETH_ALEN,(void*)core2EventLib->wNodeBssid);
+		}
+	}
+	
+	if(sta == NULL || IEEE80211_ADDR_EQ(addrBcast,sta))
+	{
+		core2EventLib->wNodeBssid = NULL;
+	}else{
+		wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char*)sta,ETH_ALEN);
+		if(wNodeTmp != NULL){
+			core2EventLib->wNodeSta = wNodeTmp;
+		}else{
+			core2EventLib->wNodeSta = initWnode(NULL);
+			memcpy(core2EventLib->wNodeBssid->mac,sta,ETH_ALEN);
+			hash_insert(ctx.wNodeAllHash,(const char*)core2EventLib->wNodeSta->mac,ETH_ALEN,(void*)core2EventLib->wNodeSta);
+		}
+	}
+}
+void bssidAndStaMacParse(struct ieee80211_frame *wh ,u_int8_t** bssid,u_int8_t** sta)
+{
+//	const u_int8_t    addrBcast[IEEE80211_ADDR_LEN]={0xff,0xff,0xff,0xff,0xff,0xff};
+	
+	if(wh == NULL || bssid == NULL || sta == NULL)
+	{
+		log_error("parm is NULL\n");
+		return ;
+	}
+
+	
+
+	if(IEEE80211_ADDR_EQ(wh->i_addr1,addrBcast) && IEEE80211_ADDR_EQ(wh->i_addr2,addrBcast))
+	{
+		*bssid = wh->i_addr3;
+		*sta = NULL;
+		return ;
+	}
+	if(IEEE80211_ADDR_EQ(wh->i_addr3,addrBcast))
+	{
+		*bssid = NULL;
+		if(IEEE80211_ADDR_EQ(wh->i_addr1,addrBcast))
+		{
+			*sta = wh->i_addr2;
+		}else{
+			*sta = wh->i_addr1;
+		}
+		return;
+	}
+
+	*bssid = wh->i_addr3;
+	if(IEEE80211_ADDR_EQ(wh->i_addr1,*bssid))
+	{
+		*sta = wh->i_addr2;
+	}else{
+		*sta = wh->i_addr1;
+	}
+
+	return ;
+}
 
 void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 {
@@ -9,11 +108,13 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 	int ret = 0;
     int type = -1, subtype, dir;
     u_int8_t* bssid=NULL;
-    u_ini8_t* sta=NULL;
+    u_int8_t* sta=NULL;
 	struct ieee80211_frame *wh;
 	wNode_t* wNodeTmp=NULL;
 	
-	wNode_t* nodeInfo = core2EventLib->wNode;
+	proberInfo_t* proberInfo = &core2EventLib->proberInfo;
+	radioInfo_t* radioInfo = &core2EventLib->radioInfo;
+	
 	snprintf(core2EventLib->tmpInfo,128,"get info from core,buf:%p,len:%d,buf:%s\n",buf,len,buf);
 	if(buf == NULL || len == 0 || core2EventLib == NULL)
 	{
@@ -21,18 +122,17 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 		return ;
 	}
 
-    memset((void *)nodeInfo->proberInfo.proberMac, 0, sizeof(ETH_ALEN));
-    memcpy((void *)nodeInfo->proberInfo.proberMac,buf+(len-ETH_ALEN),ETH_ALEN);
+    memset((void *)proberInfo->proberMac, 0, sizeof(ETH_ALEN));
+    memcpy((void *)proberInfo->proberMac,buf+(len-ETH_ALEN),ETH_ALEN);
 	len -= 6;
 
-	
 	if(wipsd_ieee80211_packet_prism(buf, &headOffset)) {
 		if(headOffset > len){
 			log_error("Invalid prism header packet!\t\n");
 			return ;
 		}
 
-		ret = wipsd_ieee80211_prism_parse(buf, nodeInfo);
+		ret = wipsd_ieee80211_prism_parse(buf, radioInfo);
 		if(!ret){
 			log_error("Parse radiotap failed!\t\n");
 			return ;
@@ -42,7 +142,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 			log_error("Invalid radiotap header packet!\t\n");
 			return ;
 		}
-		ret = wipsd_ieee80211_radiotap_parse(buf, len, nodeInfo);
+		ret = wipsd_ieee80211_radiotap_parse(buf, len, radioInfo);
 		if(ret){
 			log_error("Parse radiotap failed!\t\n");
 			return ;
@@ -54,7 +154,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 	
 	core2EventLib->wh = wh = (struct ieee80211_frame*) (buf+headOffset);
 	core2EventLib->whLen = len - headOffset;
-    if (unlikely((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) != IEEE80211_FC0_VERSION_0)) {
+    if ((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) != IEEE80211_FC0_VERSION_0) {
         /* XXX: no stats for it. */
         return ;
     }
@@ -66,8 +166,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 	switch (type)
 	{
 		case IEEE80211_FC0_TYPE_DATA:
-		
-		log_info("IEEE80211_FC0_TYPE_DATA:\n");
+			log_info("IEEE80211_FC0_TYPE_DATA:\n");
 			switch(dir)
 			{
 				case IEEE80211_FC1_DIR_TODS:
@@ -76,136 +175,92 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 					break;
 				case IEEE80211_FC1_DIR_FROMDS:
 					bssid = wh->i_addr2;
-					sta = wh->iaddr1;
+					sta = wh->i_addr1;
 					break;
 				case IEEE80211_FC1_DIR_NODS:
 					bssid = wh->i_addr1;
-					sta = wh->iaddr_2;
+					sta = wh->i_addr2;
 					break;
 				case IEEE80211_FC1_DIR_DSTODS:
 					bssid = wh->i_addr1;
-					sta = wh->iaddr_2;
+					sta = wh->i_addr2;
 					break;
 				default:
 					log_error("can not parse DIR in data frame\n");
 					return;
 					break;
 			}
-			wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char *)bssid, ETH_ALEN);
-			if(wNodeTmp != NULL){
-				core2EventLib->wNodeBssid = wNodeTmp;
-			}
-			
-			wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char*)sta,ETH_ALEN);
-			if(wNodeTmp != NULL){
-				core2EventLib->wNodeSta = wNodeTmp;
-			}
-			
+			findBssidAndSta(core2EventLib,bssid,sta);
 			handleAllCB(&ctx.pDataList,core2EventLib);
 			break;
-		case IEEE80211_FC0_TYPE_CTL:
+		case IEEE80211_FC0_TYPE_MGT:
 			log_info("WLAN_FC_TYPE_MGMT:\n");
+			bssidAndStaMacParse(wh,&bssid,&sta);
+			findBssidAndSta(core2EventLib,bssid,sta);
+			handleAllCB(&ctx.pAllManageMentFrameList,core2EventLib);
 			switch(subtype){
 				case IEEE80211_FC0_SUBTYPE_ASSOC_REQ:
 					log_info("WLAN_FC02_STYPE_ASSOC_REQ:\n");
-					bssid = wh->i_addr3;
-					sta = wh->i_addr2;
 					handleAllCB(&ctx.pAssocationRequestList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_ASSOC_RESP:
 					log_info("WLAN_FC02_STYPE_ASSOC_RESP:\n");
-					sta = wh->i_addr1;
-					bssid = wh->i_addr3;
 					handleAllCB(&ctx.pAssocationResponseList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_REASSOC_REQ:
 					log_info("WLAN_FC02_STYPE_REASSOC_REQ:\n");
-					sta = wh->i_addr2;
-					bssid = wh->i_addr3;
 					handleAllCB(&ctx.pReassocationRequestList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_REASSOC_RESP:
 					log_info("WLAN_FC02_STYPE_REASSOC_RESP:\n");
-					sta = wh->i_addr1;
-					bssid = wh->iaddr3;
 					handleAllCB(&ctx.pReassocationResponseList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_PROBE_REQ:
 					log_info("WLAN_FC02_STYPE_PROBE_REQ:\n");
-					sta = wh->i_addr2;
-					bssid = NULL;
 					handleAllCB(&ctx.pProbeRequestList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_PROBE_RESP:
-					log_info("IEEE80211_FC0_SUBTYPE_PROBE_RESP");
-					sta = wh->i_addr1;
-					bssid = wh->i_addr2;
 					handleAllCB(&ctx.pProbeResponseList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_BEACON:
 					log_info("WLAN_FC02_STYPE_BEACON:\n");
-					sta = NULL;
-					bssid = wh->i_addr3;
 					handleAllCB(&ctx.pBeaconList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_ATIM:
-				//	handleAllCB(&ctx.pATIMList,core2EventLib);
+					log_info("IEEE80211_FC0_SUBTYPE_ATIM:\n");
+					handleAllCB(&ctx.pATIMList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_DISASSOC:
-					bssid = wh->i_addr3;
+					log_info("IEEE80211_FC0_SUBTYPE_DISASSOC:\n");
 					handleAllCB(&ctx.pDisassociationList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_AUTH:
+					log_info("IEEE80211_FC0_SUBTYPE_AUTH:\n");
 					handleAllCB(&ctx.pAuthenticationList,core2EventLib);
 					break;
 				case IEEE80211_FC0_SUBTYPE_DEAUTH:
+					log_info("IEEE80211_FC0_SUBTYPE_DEAUTH:\n");
 					handleAllCB(&ctx.pDeauthenicationList,core2EventLib);
 					break;
 				default :
 					break;
 			}
 			break;
-		case IEEE80211_FC0_TYPE_MGT:
+		case IEEE80211_FC0_TYPE_CTL:
 			log_info("WLAN_FC_TYPE_CTRL:\n");
-			switch (fc02){
-				case WLAN_FC_STYPE_PSPOLL:
-					//show_hdr_pspoll(frm);
-					//WIPSD_DEBUG("WLAN_FC_STYPE_PSPOLL:\n");
-					break;
-				case WLAN_FC_STYPE_RTS:
-					//show_hdr_rts(frm);
-					//WIPSD_DEBUG("WLAN_FC_STYPE_RTS:\n");
-					check_rts(buf, len, &sta_val);
-					break;
-				case WLAN_FC_STYPE_CFEND:
-				case WLAN_FC_STYPE_CFENDACK:
-					//WIPSD_DEBUG("WLAN_FC_STYPE_CFEND WLAN_FC_STYPE_CFENDACK:\n");
-					//show_hdr_cfend(frm);
-					break;
-				case WLAN_FC_STYPE_CTS:
-					//WIPSD_DEBUG("WLAN_FC_STYPE_CTS:\n");
-					check_cts(buf, len, &sta_val);
-					break;
-				case WLAN_FC_STYPE_ACK:
-					//WIPSD_DEBUG("WLAN_FC_STYPE_ACK:\n");
-					//show_hdr_cts(frm);
-					check_ack(buf, len, &sta_val);
-					break;
+			log_info("can not support just now\n");
+			return ;/*
+			switch (subtype){
 				default :
 					break;
 			}
-			break;
+			break;*/
 		default :
 			break;
-	}
-
-
-    wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char *)&wnode->mac, 6)
+	}    
     
-    
-	
-	handleAllCB(&ctx.pBeaconList,core2EventLib);
-	
+	syncBssidAndStaInfo(core2EventLib);
+	return ;
 
 }
 
@@ -217,15 +272,18 @@ void wipsd_handle_packet(struct uloop_fd *fd, unsigned int events)
 	__u8 buf[WIPS_PKT_MAX_LEN];
 	struct sockaddr_in addr;
 	int addrLen = sizeof(struct sockaddr_in);
-	INIT_CORE2EVENTLIB_TMP(pBeacon);
-	initWnode(pBeacon.wNode);
-	pBeacon.wNode->proberInfo.fd = fd;
+	core2EventLib_t info2Event;
+	//INIT_CORE2EVENTLIB_TMP(pBeacon);
+	memset(&info2Event,0,sizeof(core2EventLib_t));
+	info2Event.wNodeSta = NULL;
+	info2Event.wNodeBssid = NULL;
+	info2Event.proberInfo.fd = fd;
 	
 	memset((void *)buf, 0, sizeof(buf));
 	
 	do {
 		errno = 0;
-		bytes = recvfrom(fd->fd, buf, sizeof(buf), 0, (struct sockaddr *)&pBeacon.wNode->proberInfo.addr, &addrLen);
+		bytes = recvfrom(fd->fd, buf, sizeof(buf), 0, (struct sockaddr *)&info2Event.proberInfo.addr, &addrLen);
 		if (bytes < 0){
 			log_error("Recv packet failed(%d) error:%d!\t\n",bytes,errno);
 			goto OUT;
@@ -240,11 +298,11 @@ void wipsd_handle_packet(struct uloop_fd *fd, unsigned int events)
 		}
 	}while(err == EINTR);
 	ctx.packetCounter++;
-
-	wipsd_handle_wlansniffrm(buf, bytes, &pBeacon);
+	freshTime();
+	wipsd_handle_wlansniffrm(buf, bytes, &info2Event);
 	OUT:
 //		log_info("goto out! count:%d\t\n",ctx.packetCounter);
-		DESTROY_CORE2EVENTLIB(pBeacon)
+//		DESTROY_CORE2EVENTLIB(pBeacon)
 		uloop_fd_add(fd, ULOOP_READ);
 
 	return;

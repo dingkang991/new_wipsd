@@ -46,17 +46,6 @@ void* EventLibInfoReturn(void)
 
 void* pBeaconTest(core2EventLib_t* tmp)
 {
-	//log_debug("get Beacon info form core to libeventis :%s\n",tmp->tmpInfo);
-	//log_debug("get beacon info form core to self:%s %s %d\n",tmp->eventInfoCore->eventLibAbsPath,\
-														tmp->eventInfoCore->eventLibInfo.eventInfo.eventName,\
-														tmp->eventInfoCore->eventLibInfo.eventInfo.eventId);
-	//log_debug("get mem info form core is :%s point:%p\n",USER_MEM(tmp),\
-															USER_MEM(tmp));
-	//strcpy(USER_MEM(tmp),"[at libtest2.so test str]");
-	
-	//log_debug("get mem info form core is :%s point:%p\n",USER_MEM(tmp),\
-														USER_MEM(tmp));
-	//log_debug("get wnode mem payload:%p,len:%d\n",tmp->payLoad,tmp->payLoadLen);
 													
 	return NULL;
 }

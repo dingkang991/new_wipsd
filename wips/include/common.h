@@ -32,4 +32,10 @@ __p->__v;	\
 })
 
 
+//#define adf_os_mem_cmp(a,b,n) memcmp(a,b,n)
+//#define OS_MEMCMP(_mem1, _mem2, _len)     adf_os_mem_cmp(_mem1, _mem2, _len)
+#define IEEE80211_ADDR_EQ(a1,a2)        (memcmp(a1, a2, IEEE80211_ADDR_LEN) == 0)
+
+
+
 #endif

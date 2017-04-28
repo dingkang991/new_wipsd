@@ -303,13 +303,13 @@ core2EventLib_t* core2EventLibInit(core2EventLib_t* core2EventLib,eventLibLinkIn
 
 	tmp->eventInfoCore = eventLibInfo;
 	tmp->eventMemCore = &eventLibInfo->eventLibInfo.eventMem;
-	if(tmp->wNode != NULL)
+	if(tmp->wNodeBssid != NULL)
 	{
-		tmp->wNode->memPayload2LibEventLen = tmp->wNode->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memLen;
-		if(tmp->wNode->memPayload2LibEventLen != 0)
-			tmp->wNode->memPayload2LibEvent = tmp->wNode->memInfo.memStart + tmp->wNode->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memOffset;
+		tmp->wNodeBssid->memPayload2LibEventLen = tmp->wNodeBssid->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memLen;
+		if(tmp->wNodeBssid->memPayload2LibEventLen != 0)
+			tmp->wNodeBssid->memPayload2LibEvent = tmp->wNodeBssid->memInfo.memStart + tmp->wNodeBssid->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memOffset;
 		else
-			tmp->wNode->memPayload2LibEvent = NULL;
+			tmp->wNodeBssid->memPayload2LibEvent = NULL;
 	}
 
 	if(tmp->wNodeSta != NULL)
@@ -379,7 +379,7 @@ void main(int argc ,char** argv)
 	core2EventLib_t pBeacon,pData;
 	snprintf(pBeacon.tmpInfo,128,"Beacon packet will comming");
 	snprintf(pData.tmpInfo,128,"Data packet will comming");
-	pBeacon.wNode = tmpWnode ;
+	pBeacon.wNodeBssid= tmpWnode ;
 	
 	handleAllCB(&ctx.pBeaconList,&pBeacon);
 	

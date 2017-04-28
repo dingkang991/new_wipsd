@@ -25,6 +25,11 @@ wNode_t* initWnode(wNode_t* node)
 	tmp->memInfo.memStart = MM_MALLOC(CORE_ID,ctx.memTotal.memLen);
 	tmp->memInfo.memLen = ctx.memTotal.memLen;
 	tmp->memInfo.memMap = ctx.memMap;
+	memset(tmp->memInfo.memStart,0,tmp->memInfo.memLen);
+
+	node->initFlag = 1;
+	setTimeNow(&node->upTime);
+//	setTimeNow(&node->lastTime);
 
 	return tmp;
 
