@@ -39,7 +39,7 @@ typedef struct radioInfo_s
 {	
 	int signal;
 	int noise;
-	int freq_band;
+	int band;
 	__u32 channel;
 	__u32 rates;
 

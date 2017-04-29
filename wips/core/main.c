@@ -734,7 +734,9 @@ void main(int argc ,char** argv)
 	insmodModule("./libtest.so");
 	insmodModule("./libtest2.so");
 */
+
 	log_error("----------------test code-----------------\n");
+	/*
 	{
 	char beaconBuf[30]={0x80,0x00,0x0,0x0,0xff,0xff,0xff,0xff,0xff,0xff,\
 	0x11,0x11,0x11,0x11,0x11,0x11,\
@@ -758,6 +760,8 @@ void main(int argc ,char** argv)
 	return 0;
 					
 }
+*/
+/*
 	wNode_t* tmpWnode = initWnode(NULL);
 	core2EventLib_t pBeacon,pData;
 	snprintf(pBeacon.tmpInfo,128,"Beacon packet will comming");
@@ -774,7 +778,7 @@ void main(int argc ,char** argv)
 	mm_stats(CORE_ID);
 	log_error("++++++++++++++++++core over+++++++++++++++++++++\n");
 
-	
+	*/
 	if(NULL ==setWipsInterface(&ctx.wipsInterface))
 	{
 		log_error("setWipsInterface error\n");

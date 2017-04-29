@@ -282,7 +282,7 @@ int wipsd_ieee80211_prism_parse(u8 *buff, radioInfo_t *value)
 	value->dataRate = (buffer[DATARATE_BYTE] / 2) * 10;	//Data rate in Mbps*10
 #else
 	value->signal = phdr->signal.data;
-	value->freq_band = (phdr->channel.data > 13 ) ? 5:2;
+	value->band = (phdr->channel.data > 13 ) ? 5:2;
 	value->channel = phdr->channel.data;
 	value->rates = phdr->rate.data;
 	value->noise = phdr->noise.data;
@@ -330,7 +330,7 @@ int wipsd_ieee80211_radiotap_parse(u8 *buf, int buflen,
 				/* TODO: convert from freq/flags to channel number */
 				freq = __le16_to_cpu(*(u16 *) iter.this_arg);
 				value->channel = wipsd_ieee80211_frequency_to_channel(freq);
-				value->freq_band = wipsd_ieee80211_frequency_to_band(freq);
+				value->band = wipsd_ieee80211_frequency_to_band(freq);
 				break;
 			case IEEE80211_RADIOTAP_RATE:
 				value->rates= *iter.this_arg * 5;

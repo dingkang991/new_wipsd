@@ -106,6 +106,15 @@ void bssidAndStaMacParse(struct ieee80211_frame *wh ,u_int8_t** bssid,u_int8_t**
 	return ;
 }
 
+void wipsRadioInfoDebug(radioInfo_t *radioInfo)
+{
+	log_info("radio info --sig:\t\t%d\n",radioInfo->signal);
+	log_info("radio info --nos:\t\t%d\n",radioInfo->noise);
+	log_info("radio info --chn:\t\t%d\n",radioInfo->channel);
+	log_info("radio info --ban:\t\t%d\n",radioInfo->band);
+	log_info("radio info --rat:\t\t%d\n",radioInfo->rates);
+	return;
+}
 void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 {
 	int headOffset = 0;
@@ -129,7 +138,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
     memset((void *)proberInfo->proberMac, 0, sizeof(ETH_ALEN));
     memcpy((void *)proberInfo->proberMac,buf+(len-ETH_ALEN),ETH_ALEN);
 	len -= 6;
-/*
+
 	if(wipsd_ieee80211_packet_prism(buf, &headOffset)) {
 		if(headOffset > len){
 			log_error("Invalid prism header packet!\t\n");
@@ -155,7 +164,8 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 		log_error("Invalid 802.11 packet!\t\n");
 		return ;
 	}
-	*/
+	
+	wipsRadioInfoDebug(radioInfo);
 	core2EventLib->wh = wh = (struct ieee80211_frame*) (buf+headOffset);
 	core2EventLib->whLen = len - headOffset;
     if ((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) != IEEE80211_FC0_VERSION_0) {
@@ -314,7 +324,9 @@ void wipsd_handle_packet(struct uloop_fd *fd, unsigned int events)
 	}while(err == EINTR);
 	ctx.packetCounter++;
 	freshTime();
+	log_info("((((((((((((((packet)))))))))))))))\n");
 	wipsd_handle_wlansniffrm(buf, bytes, &info2Event);
+	log_info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n");
 	OUT:
 //		log_info("goto out! count:%d\t\n",ctx.packetCounter);
 //		DESTROY_CORE2EVENTLIB(pBeacon)
