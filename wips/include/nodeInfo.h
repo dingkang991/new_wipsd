@@ -49,7 +49,7 @@ typedef struct radioInfo_s
 typedef struct w_node
 {
 	__u8 mac[ETH_ALEN];
-	__u8 initFlag;
+	int initFlag;
 	time_t upTime;
 	time_t lastTime;
 	radioInfo_t radioInfo;

@@ -49,14 +49,14 @@ void findBssidAndSta(core2EventLib_t* core2EventLib,u_int8_t* bssid,u_int8_t* st
 	
 	if(sta == NULL || IEEE80211_ADDR_EQ(addrBcast,sta))
 	{
-		core2EventLib->wNodeBssid = NULL;
+		core2EventLib->wNodeSta = NULL;
 	}else{
 		wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char*)sta,ETH_ALEN);
 		if(wNodeTmp != NULL){
 			core2EventLib->wNodeSta = wNodeTmp;
 		}else{
 			core2EventLib->wNodeSta = initWnode(NULL);
-			memcpy(core2EventLib->wNodeBssid->mac,sta,ETH_ALEN);
+			memcpy(core2EventLib->wNodeSta->mac,sta,ETH_ALEN);
 			hash_insert(ctx.wNodeAllHash,(const char*)core2EventLib->wNodeSta->mac,ETH_ALEN,(void*)core2EventLib->wNodeSta);
 		}
 	}
@@ -98,6 +98,10 @@ void bssidAndStaMacParse(struct ieee80211_frame *wh ,u_int8_t** bssid,u_int8_t**
 	}else{
 		*sta = wh->i_addr1;
 	}
+	if(IEEE80211_ADDR_EQ(*sta,addrBcast))
+	{
+		*sta =NULL;
+	}
 
 	return ;
 }
@@ -125,7 +129,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
     memset((void *)proberInfo->proberMac, 0, sizeof(ETH_ALEN));
     memcpy((void *)proberInfo->proberMac,buf+(len-ETH_ALEN),ETH_ALEN);
 	len -= 6;
-
+/*
 	if(wipsd_ieee80211_packet_prism(buf, &headOffset)) {
 		if(headOffset > len){
 			log_error("Invalid prism header packet!\t\n");
@@ -151,7 +155,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 		log_error("Invalid 802.11 packet!\t\n");
 		return ;
 	}
-	
+	*/
 	core2EventLib->wh = wh = (struct ieee80211_frame*) (buf+headOffset);
 	core2EventLib->whLen = len - headOffset;
     if ((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) != IEEE80211_FC0_VERSION_0) {
@@ -162,6 +166,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
     subtype = wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_MASK;
     dir = wh->i_fc[1] & IEEE80211_FC1_DIR_MASK;
 
+	log_info("type:%d,subtype:%d\n",type,subtype);
     
 	switch (type)
 	{
@@ -196,6 +201,16 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 		case IEEE80211_FC0_TYPE_MGT:
 			log_info("WLAN_FC_TYPE_MGMT:\n");
 			bssidAndStaMacParse(wh,&bssid,&sta);
+			if(bssid != NULL)
+				log_info("parse bssid:"MACSTR"\n",MAC2STR(bssid));
+			else
+				log_info("parse null bssid\n");
+
+				
+			if(sta != NULL)
+				log_info("parse sta:"MACSTR"\n",MAC2STR(sta));
+			else
+				log_info("parse null sta mac\n");
 			findBssidAndSta(core2EventLib,bssid,sta);
 			handleAllCB(&ctx.pAllManageMentFrameList,core2EventLib);
 			switch(subtype){

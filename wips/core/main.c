@@ -323,15 +323,6 @@ core2EventLib_t* core2EventLibInit(core2EventLib_t* core2EventLib,eventLibLinkIn
 			tmp->wNodeSta->memPayload2LibEvent = NULL;
 	}
 
-	
-	if(tmp->wNodeBssid != NULL)
-	{
-		tmp->wNodeBssid->memPayload2LibEventLen = tmp->wNodeBssid->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memLen;
-		if(tmp->wNodeSta->memPayload2LibEventLen != 0)
-			tmp->wNodeBssid->memPayload2LibEvent = tmp->wNodeBssid->memInfo.memStart + tmp->wNodeBssid->memInfo.memMap[eventLibInfo->eventLibInfo.eventInfo.eventId].memOffset;
-		else
-			tmp->wNodeBssid->memPayload2LibEvent = NULL;
-	}
 	return tmp;
 }
 
@@ -475,9 +466,31 @@ void main(int argc ,char** argv)
 	insmodModule("./libtest.so");
 	insmodModule("./libtest2.so");
 */
-	log_error("----------------split beacom-----------------\n");
-	
+	log_error("----------------test code-----------------\n");
+	{
+	char beaconBuf[30]={0x80,0x00,0x0,0x0,0xff,0xff,0xff,0xff,0xff,0xff,\
+	0x11,0x11,0x11,0x11,0x11,0x11,\
+	0x11,0x11,0x11,0x11,0x11,0x11,\
+	0x00,0x00,\
+	0x22,0x22,0x22,0x22,0x22,0x22\
+	};
 
+	
+	core2EventLib_t info2Event;
+	//INIT_CORE2EVENTLIB_TMP(pBeacon);
+	memset(&info2Event,0,sizeof(core2EventLib_t));
+	info2Event.wNodeSta = NULL;
+	info2Event.wNodeBssid = NULL;
+	//info2Event.proberInfo.fd = fd;
+	freshTime();
+	wipsd_handle_wlansniffrm(beaconBuf, 30, &info2Event);
+	
+	log_error("----------------test code again-----------------\n");
+ 	wipsd_handle_wlansniffrm(beaconBuf, 30, &info2Event);
+ 	log_error("_________________over______________________\n");
+	return 0;
+					
+}
 	wNode_t* tmpWnode = initWnode(NULL);
 	core2EventLib_t pBeacon,pData;
 	snprintf(pBeacon.tmpInfo,128,"Beacon packet will comming");

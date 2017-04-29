@@ -36,7 +36,7 @@ const eventLibInfo_t eventLibInfo ={
 		.memStart =NULL,
 	},
 	.wnodeMem = {
-		.wnodeMemInitLen = 8,
+		.wnodeMemInitLen = 4,
 	},
 	.eventCB ={
 		.eventCBInit = initTest,
@@ -107,6 +107,36 @@ void* initTest(void)
 
 void* pBeaconTest(core2EventLib_t* tmp)
 {
+	wNode_t *bssid =NULL;
+	if(tmp == NULL)
+	{
+		log_error("core2EventLib is NULL\n");
+		return NULL;
+	}
+
+	bssid = tmp->wNodeBssid;
+	if(bssid == NULL)
+	{
+		log_error("core2EventLib's wNodeBssid is NULL\n");
+		return NULL;
+	}
+
+	int *flag =(int*) bssid->memPayload2LibEvent;
+	int len = bssid->memPayload2LibEventLen;
+
+	if(flag == NULL)
+	{
+		log_error("core2EventLib's bssid mempayload is NULL\n");
+		return NULL;
+	}
+
+	if(*flag == 0)
+	{
+		log_info("____________bssid :"MACSTR" upline\n",MAC2STR(bssid->mac));
+		*flag = 1;
+	}else{
+		log_info("____________bssid :"MACSTR" has been uplink\n",MAC2STR(bssid->mac));
+	}
 											
 	return NULL;
 }

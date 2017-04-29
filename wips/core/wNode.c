@@ -27,16 +27,18 @@ wNode_t* initWnode(wNode_t* node)
 	tmp->memInfo.memLen = ctx.memTotal.memLen;
 	tmp->memInfo.memMap = ctx.memMap;
 	memset(tmp->memInfo.memStart,0,tmp->memInfo.memLen);
-	for(i = 0 ;i <MODULE_MAX;i++)
+	for(i = 1 ;i <MODULE_MAX;i++)
 	{
 		wNodeMemMap_t* libModule = (eventLibLinkInfo_t*)&ctx.memMap[i];
 		eventLibLinkInfo_t* module = (eventLibLinkInfo_t*) libModule->module;
+		if (module == NULL)
+			continue;
 		if(module->eventLibInfo.wnodeMem.wNodeMemInitCB != NULL)
 			module->eventLibInfo.wnodeMem.wNodeMemInitCB((void*)tmp->memInfo.memStart+libModule->memOffset,libModule->memLen);
 	}
 		
-	node->initFlag = 1;
-	setTimeNow(&node->upTime);
+	tmp->initFlag = 1;
+	setTimeNow(&tmp->upTime);
 //	setTimeNow(&node->lastTime);
 
 	return tmp;
