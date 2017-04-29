@@ -170,6 +170,112 @@ int parseCB2CTX(eventLibLinkInfo_t* tmp)
 {
 	if (NULL == tmp)
 		return -1;
+		
+
+	if (tmp->eventLibInfo.eventCB.pAllManagementFrameCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pAllManagementFrameList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pAllManagementFrameCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pAllManageMentFrameList);
+		}else{
+			log_error("module[%s] regist cb to pAllManagementFrameList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+		
+	if (tmp->eventLibInfo.eventCB.pAssocationRequestCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pAssocationRequestList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pAssocationRequestCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pAssocationRequestList);
+		}else{
+			log_error("module[%s] regist cb to pAssocationRequestList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pAssocationResponseCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pAssocationResponseList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pAssocationResponseCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pAssocationResponseList);
+		}else{
+			log_error("module[%s] regist cb to pAssocationResponseList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pReassocationRequestCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pReassocationRequestList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pReassocationRequestCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pReassocationRequestList);
+		}else{
+			log_error("module[%s] regist cb to pReassocationRequestList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pReassocationResponseCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pReassocationResponseList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pReassocationResponseCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pReassocationResponseList);
+		}else{
+			log_error("module[%s] regist cb to pReassocationResponseList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pProbeRequestCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pProbeRequestList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pProbeRequestCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pProbeRequestList);
+		}else{
+			log_error("module[%s] regist cb to pProbeRequestList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pProbeResponseCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pProbeResponseList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pProbeResponseCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pProbeResponseList);
+		}else{
+			log_error("module[%s] regist cb to pProbeResponseList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
 	if (tmp->eventLibInfo.eventCB.pBeaconCB != NULL)
 	{
 		funcCB_t *funcTmp;
@@ -180,6 +286,168 @@ int parseCB2CTX(eventLibLinkInfo_t* tmp)
 			list_add(&(funcTmp->list),&ctx.pBeaconList);
 		}else{
 			log_error("module[%s] regist cb to pBeacon error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pATIMCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pATIMCB\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pATIMCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pATIMList);
+		}else{
+			log_error("module[%s] regist cb to pATIMCB error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pDisassociationCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pDisassociationList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pDisassociationCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pDisassociationList);
+		}else{
+			log_error("module[%s] regist cb to pDisassociationList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pAuthenticationCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pAuthenticationList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pAuthenticationCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pAuthenticationList);
+		}else{
+			log_error("module[%s] regist cb to pAuthenticationList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+	if (tmp->eventLibInfo.eventCB.pDeauthenicationCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pDeauthenicationList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pDeauthenicationCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pDeauthenicationList);
+		}else{
+			log_error("module[%s] regist cb to pDeauthenicationList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+	if (tmp->eventLibInfo.eventCB.pAllControlFrameCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pAllControlFrameCB\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pAllControlFrameCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pAllControlFrameList);
+		}else{
+			log_error("module[%s] regist cb to pAllControlFrameCB error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+	if (tmp->eventLibInfo.eventCB.pPowerSaveCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pPowerSaveList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pPowerSaveCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pPowerSaveList);
+		}else{
+			log_error("module[%s] regist cb to pPowerSaveList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+	if (tmp->eventLibInfo.eventCB.pRTSCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pRTSList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pRTSCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pRTSList);
+		}else{
+			log_error("module[%s] regist cb to pRTSList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+
+		
+	if (tmp->eventLibInfo.eventCB.pCTSCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pCTSList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pCTSCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pCTSList);
+		}else{
+			log_error("module[%s] regist cb to pCTSList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pACKCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pACKList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pACKCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pACKList);
+		}else{
+			log_error("module[%s] regist cb to pACKList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pCFEndCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pCFEndList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pCFEndCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pCFEndList);
+		}else{
+			log_error("module[%s] regist cb to pCFEndList error\n",tmp->eventLibInfo.eventLibName);
+		}
+		
+	}
+
+		
+	if (tmp->eventLibInfo.eventCB.pCFEndACKCB != NULL)
+	{
+		funcCB_t *funcTmp;
+		log_info("module[%s] regist cb to pCFEndACKList\n",tmp->eventLibInfo.eventLibName);
+		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pCFEndACKCB,tmp);
+		if(funcTmp != NULL)
+		{	
+			list_add(&(funcTmp->list),&ctx.pCFEndACKList);
+		}else{
+			log_error("module[%s] regist cb to pCFEndACKList error\n",tmp->eventLibInfo.eventLibName);
 		}
 		
 	}
@@ -474,7 +742,6 @@ void main(int argc ,char** argv)
 	0x00,0x00,\
 	0x22,0x22,0x22,0x22,0x22,0x22\
 	};
-
 	
 	core2EventLib_t info2Event;
 	//INIT_CORE2EVENTLIB_TMP(pBeacon);
