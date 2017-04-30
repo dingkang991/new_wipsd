@@ -25,20 +25,26 @@ const eventLibInfo_t eventLibInfo ={
 /*这个结构定义了lib库内需要的内存大小.这个内存在每次回调到lib库时会传到lib库内的回调函数的参数内*/
 		.memInitLen=1024,/*需要申请的内存大小*/
 		.memLen = 0,/*框架使用,这里置0*/
-		.memStart =NULL,/*所申请的内存*/
+		.memStart =NULL,/*所申请的内存地址，事件库注册时会分配此地址*/
 	},
-	.wnodeMem = {/*每个sta或者bssid存储是使用wNode_t结构*/
-		.wnodeMemInitLen = 4,
+	.wnodeMem = {/*每个sta或者bssid存储是使用wNode_t结构,这个结构会为每一个事件申请一段独立的内存，以供事件检测使用，这里标识这个事件在每个wnode结构中所需要的空间大小*/
+		.wnodeMemInitLen = sizeof(int),/*这里只申请一个int，作为是否上报过事件的flag*/
+		.wNodeMemInitCB = NULL;/*所有wNode_t结构创建的时候都会调用此函数，并返回wNode_t中所属于libevent中的内存地址，回调函数用来初始化这部分地址*/
+		.wNodeMemDestroyCB= NULL;/*wNode 销毁时会调用此回调*/
+		
 	},
-	.eventCB ={
-		.eventCBInit = initTest,
-		.pBeaconCB = pBeaconTest,
-		.pDataCB = pDataTest,
+	.eventCB ={/*回调函数结构注册*/
+	void (*pDataCB)(void*);
+		.eventCBInit = initTest,/*事件加载时会被调用*/
+		.pAllManagementFrameCB = NULL;/*所有管理报文收到会调用*/
+		.pAssocationRequestCB =NULL;
+		.pBeaconCB = pBeaconTest,/*所有beacon报文回调*/
+		//.pDataCB = pDataTest,
 	}
 };
 
 #if 1
-MM_STATS(LIBEVENT_TEST_ID)
+MM_STATS(LIBEVENT_TEST_ID)/*内存管理必须*/
 #else
 unsigned long mm_nbofallocs=0;
 unsigned long mm_sizeofallocs=0;
@@ -85,7 +91,7 @@ void mm_stats()
 #endif
 
 
-void* EventLibInfoReturn(void)
+void* EventLibInfoReturn(void)/*固定必须这么写，函数名不能动，实现也不能动*/
 {
 	;
 	return (void*)&eventLibInfo;
@@ -96,8 +102,23 @@ void* initTest(void)
 	log_debug("at libtest.so func(init_test) test\n");
 	return NULL;
 }
+#if 0
+/*wips 框架传给lib的数据*/
+typedef struct core2EventLib_s{
+	char tmpInfo[128];/*测试用，会去掉*/
+	eventLibLinkInfo_t* eventInfoCore;/*lib库在框架中的信息*/
+	eventLibMemInfo_t* eventMemCore;/*事件内存信息，1024*/
 
-void* pBeaconTest(core2EventLib_t* tmp)
+	proberInfo_t proberInfo;/*上报报文的探针信息*/
+	radioInfo_t radioInfo;/*报文的无线信息*/
+	wNode_t* wNodeSta;/*报文对应的sta wNode，可能为NULL*/
+	wNode_t* wNodeBssid;/*报文对应的bss wNode,可能为NULL*/
+	struct ieee80211_frame *wh;/*报文*/
+	int whLen;/*报文长度*/
+}core2EventLib_t;
+#endif
+
+void* pBeaconTest(core2EventLib_t* tmp)/*检测函数，beacon帧回调函数*/
 {
 	wNode_t *bssid =NULL;
 	if(tmp == NULL)
@@ -139,14 +160,14 @@ void* pDataTest(core2EventLib_t* tmp)
 	return NULL;
 }
 
-__attribute__((constructor)) void* insmod_func(void)
+__attribute__((constructor)) void* insmod_func(void)/*lib库加载时会被调用*/
 {
 
 log_debug("at libtest.so will insmod\n");
 return NULL;
 }
 
-__attribute__((destructor)) void* rmmod_func(void)
+__attribute__((destructor)) void* rmmod_func(void)/*lib库被销毁后会被调用，框架推出也会调用，没啥用*/
 {
 
 log_debug("at libtest.so will rmmod\n");
