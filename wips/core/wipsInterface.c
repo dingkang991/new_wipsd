@@ -324,7 +324,8 @@ void wipsd_handle_packet(struct uloop_fd *fd, unsigned int events)
 	}while(err == EINTR);
 	ctx.packetCounter++;
 	freshTime();
-	log_info("((((((((((((((packet)))))))))))))))\n");
+	log_info("((((((((((((((packet:%lu)))))))))))))))\n",ctx.packetCounter);
+	
 	wipsd_handle_wlansniffrm(buf, bytes, &info2Event);
 	log_info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n");
 	OUT:
