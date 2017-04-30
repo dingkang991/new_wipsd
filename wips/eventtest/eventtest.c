@@ -1,41 +1,33 @@
 #include <stdio.h>
+/*以下两个头文件必须引用*/
 #include "eventtest.h"
 #include "memory.h"
 
+/*事件:检测ap上线,并输出bssid*/
 
-
-
+/*事件内处理函数的声明*/
 void* initTest(void);
 void* pBeaconTest(core2EventLib_t * tmp);
 void* pDataTest(core2EventLib_t * tmp);
 void* getEventReturn(void);
+/*内存检测模块使用,必须引用*/
+extern memstat mstat[MODULE_MAX]; 
 
-extern memstat mstat[MODULE_MAX];
-/*
-eventInfo_t eventInfo ={
-	.eventId = 1,
-	.eventName = "test event",
-	.eventDescription = "test event discription"
-};
-
-eventCB_t eventCB ={
-	.eventCBInit = init_test
-};
-*/
-
+/*lib 库信息结构*/
 const eventLibInfo_t eventLibInfo ={
-	.eventLibName = "libtest.so",
-	.eventInfo = {
-		.eventId = LIBEVENT_TEST_ID,
-		.eventName = "test event",
-		.eventDescription = "test event discription"
+	.eventLibName = "libtest.so",/*lib库名称*/
+	.eventInfo = {/*lib 内事件信息结构定义*/
+		.eventId = LIBEVENT_TEST_ID,/*事件ID,在主框架中头文件eventinfo.h中定义*/
+		.eventName = "test event",/*事件名称*/
+		.eventDescription = "test event discription"/*lib库检测事件的详细描述*/
 	},
-	.eventMem = {
-		.memInitLen=1024,
-		.memLen = 0,
-		.memStart =NULL,
+	.eventMem = {/*框架内使用内存管理,在lib库内尽量不要申请内存*/
+/*这个结构定义了lib库内需要的内存大小.这个内存在每次回调到lib库时会传到lib库内的回调函数的参数内*/
+		.memInitLen=1024,/*需要申请的内存大小*/
+		.memLen = 0,/*框架使用,这里置0*/
+		.memStart =NULL,/*所申请的内存*/
 	},
-	.wnodeMem = {
+	.wnodeMem = {/*每个sta或者bssid存储是使用wNode_t结构*/
 		.wnodeMemInitLen = 4,
 	},
 	.eventCB ={
