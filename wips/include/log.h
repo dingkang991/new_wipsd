@@ -10,6 +10,8 @@
 #define AVL_TREE			1<<1 // 2
 #define HASH				1<<2	 // 4
 #define API					1<<3	 // 8
+#define CORE_WNODE			1<<4	 // 16
+
 #define TEST1_LOG			1<<10 // 1024
 #define TEST2_LOG			1<<11 // 2048
 

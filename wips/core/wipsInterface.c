@@ -26,6 +26,9 @@ void syncBssidAndStaInfo(core2EventLib_t* core2EventLib)
 void findBssidAndSta(core2EventLib_t* core2EventLib,u_int8_t* bssid,u_int8_t* sta)
 {
 	wNode_t* wNodeTmp=NULL;
+	char bssidStr[ETH_STR_ALEN]={0};
+	char staStr[ETH_STR_ALEN]={0};
+
 
 	if(core2EventLib == NULL)
 	{
@@ -37,13 +40,20 @@ void findBssidAndSta(core2EventLib_t* core2EventLib,u_int8_t* bssid,u_int8_t* st
 	{
 		core2EventLib->wNodeBssid = NULL;
 	}else{
-		wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char *)bssid, ETH_ALEN);
+		snprintf(bssidStr,ETH_STR_ALEN,MACSTR,MAC2STR(bssid));
+		wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, bssidStr,ETH_STR_ALEN);
 		if(wNodeTmp != NULL){
 			core2EventLib->wNodeBssid = wNodeTmp;
 		}else{
 			core2EventLib->wNodeBssid = initWnode(NULL);
 			memcpy(core2EventLib->wNodeBssid->mac,bssid,ETH_ALEN);
-			hash_insert(ctx.wNodeAllHash,(const char*)core2EventLib->wNodeBssid->mac,ETH_ALEN,(void*)core2EventLib->wNodeBssid);
+			memcpy(core2EventLib->wNodeBssid->macStr,bssidStr,ETH_STR_ALEN);
+			if(NULL != hash_insert(ctx.wNodeAllHash,(const char*)core2EventLib->wNodeBssid->macStr,ETH_STR_ALEN,(void*)core2EventLib->wNodeBssid))
+			{
+				log_error_wnode("hash_insert bssid error ,mac:%s \n",(core2EventLib->wNodeBssid->macStr));
+			}else{
+				log_info_wnode("hash_insert,bssid mac %s point:%p\n",(core2EventLib->wNodeBssid->macStr),core2EventLib->wNodeBssid);
+			}
 		}
 	}
 	
@@ -51,13 +61,21 @@ void findBssidAndSta(core2EventLib_t* core2EventLib,u_int8_t* bssid,u_int8_t* st
 	{
 		core2EventLib->wNodeSta = NULL;
 	}else{
-		wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, (const char*)sta,ETH_ALEN);
+		snprintf(staStr,ETH_STR_ALEN,MACSTR,MAC2STR(sta));
+		wNodeTmp = (wNode_t*)hash_find(ctx.wNodeAllHash, staStr,ETH_STR_ALEN);
 		if(wNodeTmp != NULL){
 			core2EventLib->wNodeSta = wNodeTmp;
 		}else{
 			core2EventLib->wNodeSta = initWnode(NULL);
 			memcpy(core2EventLib->wNodeSta->mac,sta,ETH_ALEN);
-			hash_insert(ctx.wNodeAllHash,(const char*)core2EventLib->wNodeSta->mac,ETH_ALEN,(void*)core2EventLib->wNodeSta);
+			memcpy(core2EventLib->wNodeSta->macStr,staStr,ETH_STR_ALEN);
+			if(NULL != hash_insert(ctx.wNodeAllHash,(const char*)core2EventLib->wNodeSta->macStr,ETH_STR_ALEN,(void*)core2EventLib->wNodeSta))
+			{
+				
+				log_error_wnode("hash_insert sta error ,mac:%s\n",(core2EventLib->wNodeSta->macStr));
+			}else{
+				log_info_wnode("hash_insert,sta mac %s point:%p\n",(core2EventLib->wNodeSta->macStr),core2EventLib->wNodeSta);
+			}
 		}
 	}
 }
@@ -165,7 +183,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 		return ;
 	}
 	
-	wipsRadioInfoDebug(radioInfo);
+//	wipsRadioInfoDebug(radioInfo);
 	core2EventLib->wh = wh = (struct ieee80211_frame*) (buf+headOffset);
 	core2EventLib->whLen = len - headOffset;
     if ((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) != IEEE80211_FC0_VERSION_0) {
@@ -324,10 +342,15 @@ void wipsd_handle_packet(struct uloop_fd *fd, unsigned int events)
 	}while(err == EINTR);
 	ctx.packetCounter++;
 	freshTime();
-	log_info("((((((((((((((packet:%lu)))))))))))))))\n",ctx.packetCounter);
+	//log_info("((((((((((((((packet:%lu)))))))))))))))\n",ctx.packetCounter);
 	
 	wipsd_handle_wlansniffrm(buf, bytes, &info2Event);
-	log_info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n");
+	log_info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ :diff:%f\n\n",(difftime(ctx.timeNow,ctx.wNodeListTime)));
+	if(difftime(ctx.timeNow,ctx.wNodeListTime) > ctx.traversalTime)
+	{
+		memcpy(&ctx.wNodeListTime,&ctx.timeNow,sizeof(time_t));
+		ListAndDestoryWnode();
+	}
 	OUT:
 //		log_info("goto out! count:%d\t\n",ctx.packetCounter);
 //		DESTROY_CORE2EVENTLIB(pBeacon)

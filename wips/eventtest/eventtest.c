@@ -10,6 +10,9 @@ void* initTest(void);
 void* pBeaconTest(core2EventLib_t * tmp);
 void* pDataTest(core2EventLib_t * tmp);
 void* getEventReturn(void);
+void wNodeCreateCB(void*,int);
+void wNodeDestoryCB(void*,int);
+
 /*内存检测模块使用,必须引用*/
 extern memstat mstat[MODULE_MAX]; 
 
@@ -29,15 +32,14 @@ const eventLibInfo_t eventLibInfo ={
 	},
 	.wnodeMem = {/*每个sta或者bssid存储是使用wNode_t结构,这个结构会为每一个事件申请一段独立的内存，以供事件检测使用，这里标识这个事件在每个wnode结构中所需要的空间大小*/
 		.wnodeMemInitLen = sizeof(int),/*这里只申请一个int，作为是否上报过事件的flag*/
-		.wNodeMemInitCB = NULL;/*所有wNode_t结构创建的时候都会调用此函数，并返回wNode_t中所属于libevent中的内存地址，回调函数用来初始化这部分地址*/
-		.wNodeMemDestroyCB= NULL;/*wNode 销毁时会调用此回调*/
+		.wNodeMemInitCB = wNodeCreateCB,/*所有wNode_t结构创建的时候都会调用此函数，并返回wNode_t中所属于libevent中的内存地址，回调函数用来初始化这部分地址*/
+		.wNodeMemDestroyCB= wNodeDestoryCB/*wNode 销毁时会调用此回调*/
 		
 	},
 	.eventCB ={/*回调函数结构注册*/
-	void (*pDataCB)(void*);
 		.eventCBInit = initTest,/*事件加载时会被调用*/
-		.pAllManagementFrameCB = NULL;/*所有管理报文收到会调用*/
-		.pAssocationRequestCB =NULL;
+		.pAllManagementFrameCB = NULL,/*所有管理报文收到会调用*/
+		.pAssocationRequestCB =NULL,
 		.pBeaconCB = pBeaconTest,/*所有beacon报文回调*/
 		//.pDataCB = pDataTest,
 	}
@@ -117,7 +119,18 @@ typedef struct core2EventLib_s{
 	int whLen;/*报文长度*/
 }core2EventLib_t;
 #endif
-
+void wNodeCreateCB(void* ptr,int len)
+{
+	log_info("wNodeCreate CB,ptr = %p len:%d\n",ptr,len);
+	return;
+}
+void wNodeDestoryCB(void* ptr,int len)
+{
+	log_info("wNode Destory CB,ptr = %p len:%d\n",ptr,len);
+	int *flag = (int*) ptr;
+	log_info("wNode Destory CB, flag:%d\n",*flag);
+	return;
+}
 void* pBeaconTest(core2EventLib_t* tmp)/*检测函数，beacon帧回调函数*/
 {
 	wNode_t *bssid =NULL;

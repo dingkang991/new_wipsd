@@ -79,7 +79,7 @@ void *mm_malloc(int type, size_t sz, char *file, int line)
 			allocation->size = sz;
 			allocation->loop_back = &mstat[type];
 			/* insert in the tree */
-			bstree_add(&mstat[type].mm_root, (void *)allocation, mm_compare);
+			//bstree_add(&mstat[type].mm_root, (void *)allocation, mm_compare);
 			//printf("[MM] Alloc'ed %d bytes at %s:%d\n",allocation->size,allocation->file,allocation->line);
 		}
 		else {
@@ -113,7 +113,7 @@ void *mm_calloc(int type, size_t times, size_t sz, char *file, int line)
 			allocation->line = line;
 			allocation->size = sz*times;
 			allocation->loop_back = &mstat[type];
-			bstree_add(&mstat[type].mm_root, (void *)allocation, mm_compare);
+		//	bstree_add(&mstat[type].mm_root, (void *)allocation, mm_compare);
 			printf("[MM] Alloc'ed %d bytes at %s:%d point:%p\n",allocation->size,allocation->file,allocation->line,allocation);
 		}
 		else 
@@ -130,7 +130,7 @@ void mm_free(int type, void *pt)
 	{
 		memory_allocation toSearch;
 		toSearch.pt = pt;
-		bstree_delete(&mstat[type].mm_root, &toSearch, mm_compare, mm_free_struct);
+		//bstree_delete(&mstat[type].mm_root, &toSearch, mm_compare, mm_free_struct);
 		mstat[type].alloc_times--;
 		free(pt);
 	}

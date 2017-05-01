@@ -16,6 +16,7 @@
 #define SSID_BUFSIZE	63
 #define SSID_BUFSIZE_D	(SSID_BUFSIZE+1)
 #define ETH_ALEN 6
+#define ETH_STR_ALEN 18
 
 typedef unsigned char           u8,_u8,__u8;
 typedef unsigned short          u16,_u16,__u16;

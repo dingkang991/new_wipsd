@@ -12,6 +12,11 @@
 #define log_error(format,...) LOG("core",CORE,0,LEVEL_ERROR,format,  ##__VA_ARGS__)
 #define log_warn(format,...) LOG("core",CORE,0,LEVEL_WARN,format,  ##__VA_ARGS__)
 
+#define log_info_wnode(format,...) LOG("core_wnode",CORE_WNODE,0,LEVEL_INFO,format,  ##__VA_ARGS__)
+#define log_debug_wnode(format,...) LOG("core_wnode",CORE_WNODE,0,LEVEL_DEBUG,format,  ##__VA_ARGS__)
+#define log_error_wnode(format,...) LOG("core_wnode",CORE_WNODE,0,LEVEL_ERROR,format,  ##__VA_ARGS__)
+#define log_warn_wnode(format,...) LOG("core_wnode",CORE_WNODE,0,LEVEL_WARN,format,  ##__VA_ARGS__)
+
 
 
 struct wipsContext{
@@ -40,7 +45,10 @@ struct wipsContext{
 	struct list_head wNodeBSS;
 	struct list_head wNodeSta;
 	struct hash_control *wNodeAllHash;
+	int againgTime;
+	int traversalTime;
 	time_t timeNow;
+	time_t wNodeListTime;
 	wNodeMem_t memTotal;
 	wNodeMemMap_t memMap[MODULE_MAX];
 	int memMapOffset;

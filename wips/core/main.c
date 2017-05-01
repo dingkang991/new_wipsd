@@ -429,7 +429,7 @@ int parseCB2CTX(eventLibLinkInfo_t* tmp)
 		log_info("module[%s] regist cb to pCFEndList\n",tmp->eventLibInfo.eventLibName);
 		funcTmp = initFuncCB(tmp->eventLibInfo.eventCB.pCFEndCB,tmp);
 		if(funcTmp != NULL)
-		{	
+		{
 			list_add(&(funcTmp->list),&ctx.pCFEndList);
 		}else{
 			log_error("module[%s] regist cb to pCFEndList error\n",tmp->eventLibInfo.eventLibName);
@@ -643,6 +643,29 @@ void loadBaseConfig()
 		sscanf(configValue,"%d",&logLevel);
 	}
 
+	
+	/*****againgTime******/
+	configValue = confread_find_value(root,"againgTime");
+	if(configValue == NULL)
+	{
+		log_error("can not load config key(%s) ,load default 30\n","againgTime");
+		ctx.againgTime = 30;
+	}else{
+		log_info("find key(%s),value(%s)\n","againgTime",configValue);
+		sscanf(configValue,"%d",&ctx.againgTime);
+	}
+
+	/*****travelsalTime******/
+	configValue = confread_find_value(root,"traversalTime");
+	if(configValue == NULL)
+	{
+		log_error("can not load config key(%s) ,load default 60\n","travelsalTime");
+		ctx.againgTime = 60;
+	}else{
+		log_info("find key(%s),value(%s)\n","travelsalTime",configValue);
+		sscanf(configValue,"%d",&ctx.traversalTime);
+	}
+
 	return;
 }
 
@@ -690,9 +713,13 @@ void main(int argc ,char** argv)
 	opterr = 0;
 	
 	ctxInit();
-	while((ch = getopt(argc, argv, "a:b:l:f:")) != -1)
+	while((ch = getopt(argc, argv, "a:b:l:f:h")) != -1)
 	switch(ch)
 	{
+		case 'h':
+			log_debug("option h,debug hash\n");
+			main_hash();
+			break;
 		case 'a':
 			log_debug("option a:'%s'\n", optarg);
 			sscanf(optarg,"%d",&logType1);

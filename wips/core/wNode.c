@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "hash.h"
 #include "eventInfo.h"
 #include "memory.h"
 #include "main.h"
@@ -54,16 +55,25 @@ int destroyWnode(wNode_t* node,int is_free)
 		return -1;
 	}
 	
-	for(i = 0 ;i <MODULE_MAX;i++)
+	for(i = 1 ;i < MODULE_MAX;i++)
 	{
 		wNodeMemMap_t* libModule = (eventLibLinkInfo_t*)&ctx.memMap[i];
 		eventLibLinkInfo_t* module = (eventLibLinkInfo_t*) libModule->module;
+		if(module == NULL)
+			continue;
 		if(module->eventLibInfo.wnodeMem.wNodeMemDestroyCB != NULL)
 			module->eventLibInfo.wnodeMem.wNodeMemDestroyCB((void*)node->memInfo.memStart+libModule->memOffset,libModule->memLen);
+	}
+	if(hash_delete(ctx.wNodeAllHash,node->macStr,ETH_STR_ALEN,1) == NULL)
+	{
+		log_error_wnode("del wnode error ,step hash_delete,mac:"MACSTR"\n",MAC2STR(node->mac));
+		exit (0);
 	}
 	
 
 	MM_FREE(CORE_ID,node->memInfo.memStart);
+	
+	
 
 	if(is_free!=0)
 		MM_FREE(CORE_ID,node);
@@ -72,5 +82,47 @@ int destroyWnode(wNode_t* node,int is_free)
 
 }
 
+void
+wNodeHandle (string, value)
+     char *string;
+     char *value;
+{
+	wNode_t* tmp = (wNode_t*)value;
+	int strLen = strlen(string);
+	if(strLen != (ETH_STR_ALEN-1))
+	{
+		return ;
+	}
+	double diffTime = difftime(ctx.timeNow,tmp->lastTime);
+	log_info_wnode("func(%s),check wnode:"MACSTR"(%p),string:%s diff:%f\n",__func__,MAC2STR(tmp->mac),tmp,string,diffTime);
+	
+	if(diffTime >=	ctx.againgTime)
+	{
+		log_info_wnode("del wNode :"MACSTR"\n",MAC2STR(tmp->mac));
+		destroyWnode(tmp,1);
+	}
+}
+
+int ListAndDestoryWnode()
+{
+	unsigned int i;
+//	struct hash_control *table = NULL;
+	char logStr[512];
+
+	log_info_wnode("(((((((((((((((check wnode time )))))))))))))\n");
+//	snprintf(logStr,512,"time now:%s",ctime(&ctx.timeNow));
+	log_info_wnode("time now:%s",ctime(&ctx.timeNow));
+//	log_info("%s\n",logStr);
+//	table = ctx.wNodeAllHash;
+
+	if(ctx.wNodeAllHash == NULL)
+	{
+		log_error("ctx.wNodeAllHash is NULL\n");
+		return -1;
+	}
+	
+	hash_traverse (ctx.wNodeAllHash, wNodeHandle);
+	
+}
 
 
