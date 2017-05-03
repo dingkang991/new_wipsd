@@ -66,7 +66,7 @@ int destroyWnode(wNode_t* node,int is_free)
 	}
 	if(hash_delete(ctx.wNodeAllHash,node->macStr,ETH_STR_ALEN,1) == NULL)
 	{
-		log_error_wnode("del wnode error ,step hash_delete,mac:"MACSTR"\n",MAC2STR(node->mac));
+		log_error_wnode("!!!!!!!!!!del wnode error ,step hash_delete,mac:"MACSTR"\n",MAC2STR(node->mac));
 		exit (0);
 	}
 	

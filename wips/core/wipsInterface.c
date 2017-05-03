@@ -183,7 +183,7 @@ void wipsd_handle_wlansniffrm(__u8 *buf, int len,core2EventLib_t* core2EventLib)
 		return ;
 	}
 	
-//	wipsRadioInfoDebug(radioInfo);
+	wipsRadioInfoDebug(radioInfo);
 	core2EventLib->wh = wh = (struct ieee80211_frame*) (buf+headOffset);
 	core2EventLib->whLen = len - headOffset;
     if ((wh->i_fc[0] & IEEE80211_FC0_VERSION_MASK) != IEEE80211_FC0_VERSION_0) {
@@ -342,7 +342,7 @@ void wipsd_handle_packet(struct uloop_fd *fd, unsigned int events)
 	}while(err == EINTR);
 	ctx.packetCounter++;
 	freshTime();
-	//log_info("((((((((((((((packet:%lu)))))))))))))))\n",ctx.packetCounter);
+	log_info("((((((((((((((packet:%lu)))))))))))))))\n",ctx.packetCounter);
 	
 	wipsd_handle_wlansniffrm(buf, bytes, &info2Event);
 	log_info("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ :diff:%f\n\n",(difftime(ctx.timeNow,ctx.wNodeListTime)));

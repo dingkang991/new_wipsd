@@ -286,8 +286,8 @@ hash_insert (struct hash_control *table, const char *key, int key_len, void *val
   ++table->insertions;
 #endif
 
-  p = (struct hash_entry *) obstack_alloc (&table->memory, sizeof (*p));
-//  p = (struct hash_entry *) XMALLOC (MTYPE_WIPS_DEBUG_HASH_NODE,sizeof (struct hash_entry));
+ // p = (struct hash_entry *) obstack_alloc (&table->memory, sizeof (*p));
+  p = (struct hash_entry *) malloc (sizeof (struct hash_entry));
   p->string = key;
   p->hash = hash;
   p->data = val;
@@ -423,8 +423,8 @@ hash_delete (struct hash_control *table, const char *key, int key_len, int freem
   *list = p->next;
 tmp=p->data;
   if (freeme)
-  //  XFREE (MTYPE_WIPS_DEBUG_HASH_NODE,p);
-  	obstack_free (&table->memory, p);
+    free (p);
+  	//obstack_free (&table->memory, p);
 
   return tmp;
 }
@@ -442,8 +442,19 @@ hash_traverse (struct hash_control *table,
     {
       struct hash_entry *p;
 
-      for (p = table->table[i]; p != NULL; p = p->next)
-	(*pfn) (p->string, p->data);
+      for (p = table->table[i]; p != NULL; )
+      {
+      	struct hash_entry* tmp=p;
+      	if(p->next != NULL)
+      	{
+      		p=p->next;
+      	
+		(*pfn) (tmp->string, tmp->data);
+      	}else{
+		(*pfn) (tmp->string, tmp->data);
+		break;
+		}
+		}
     }
 }
 
