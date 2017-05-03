@@ -12,7 +12,6 @@
 #include "ustream.h"
 #include "uloop.h"
 #include "usock.h"
-#include "eventInfo.h"
 
 #define WIPSD_SOCKET_PORT 13524
 #define WIPSD_SOCKET_PORT_STR "13524"

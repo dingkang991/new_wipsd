@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <dlfcn.h>
 #include <string.h>
+#include "eventInfo.h"
 #include "memory.h"
 #include "main.h"
 #include "nodeInfo.h"
 #include "wipsInterface.h"
 #include "confread.h"
+#include "eventInfo.h"
 
 int logType1= 0xffffffff;
 int logType2= 0xffffffff;
@@ -763,31 +765,33 @@ void main(int argc ,char** argv)
 */
 
 	log_error("----------------test code-----------------\n");
-	/*
+	
 	{
+	struct ieee80211_frame* wh;
 	char beaconBuf[30]={0x80,0x00,0x0,0x0,0xff,0xff,0xff,0xff,0xff,0xff,\
 	0x11,0x11,0x11,0x11,0x11,0x11,\
 	0x11,0x11,0x11,0x11,0x11,0x11,\
 	0x00,0x00,\
 	0x22,0x22,0x22,0x22,0x22,0x22\
 	};
+	wh = beaconBuf;
+	int i = 1;
 	
+	for(;i<=0xffff;i++){
+	wh->i_addr3 = i;
 	core2EventLib_t info2Event;
-	//INIT_CORE2EVENTLIB_TMP(pBeacon);
 	memset(&info2Event,0,sizeof(core2EventLib_t));
 	info2Event.wNodeSta = NULL;
 	info2Event.wNodeBssid = NULL;
-	//info2Event.proberInfo.fd = fd;
 	freshTime();
 	wipsd_handle_wlansniffrm(beaconBuf, 30, &info2Event);
-	
-	log_error("----------------test code again-----------------\n");
- 	wipsd_handle_wlansniffrm(beaconBuf, 30, &info2Event);
+//	msleep(100);
+	}
  	log_error("_________________over______________________\n");
 	return 0;
 					
-}
-*/
+	}
+
 /*
 	wNode_t* tmpWnode = initWnode(NULL);
 	core2EventLib_t pBeacon,pData;

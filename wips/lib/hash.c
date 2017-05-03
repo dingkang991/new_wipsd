@@ -1,3 +1,4 @@
+#if 1
 /* hash.c -- gas hash table code
    Copyright 1987, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999,
    2000, 2001, 2002, 2003, 2005, 2007, 2008, 2009
@@ -673,4 +674,125 @@ whattable ()
 }
 
 #endif /* TEST */
+#else
+
+struct hash_control *
+hash_new (void)
+{
+  unsigned long size;
+  unsigned long alloc;
+  struct hash_control *ret;
+
+  size = get_gas_hash_table_size ();
+
+  ret = (struct hash_control *) MM_MALLOC (CORE,sizeof *ret);
+  alloc = size * sizeof (struct hash_entry *);
+  ret->table = (struct hash_entry **) MM_MALLOC (CORE, alloc);
+  memset (ret->table, 0, alloc);
+  ret->size = size;
+
+  return ret;
+}
+
+static struct hash_entry *
+hash_lookup (struct hash_control *table, const char *key, size_t len,
+	     struct hash_entry ***plist, unsigned long *phash)
+{
+  unsigned long hash;
+  size_t n;
+  unsigned int c;
+  unsigned int hindex;
+  struct hash_entry **list;
+  struct hash_entry *p;
+  struct hash_entry *prev;
+
+#ifdef HASH_STATISTICS
+  ++table->lookups;
+#endif
+
+  hash = 0;
+  for (n = 0; n < len; n++)
+    {
+      c = key[n];
+      hash += c + (c << 17);
+      hash ^= hash >> 2;
+    }
+  hash += len + (len << 17);
+  hash ^= hash >> 2;
+
+  if (phash != NULL)
+    *phash = hash;
+
+  hindex = hash % table->size;
+  list = table->table + hindex;
+  if (plist != NULL)
+    *plist = list;
+
+  prev = NULL;
+  for (p = *list; p != NULL; p = p->next)
+    {
+#ifdef HASH_STATISTICS
+      ++table->hash_compares;
+#endif
+
+      if (p->hash == hash)
+	{
+#ifdef HASH_STATISTICS
+	  ++table->string_compares;
+#endif
+	  if (memcmp (p->string, key, len) == 0 /*&& p->string[len] == '\0'*/)
+	    {
+	      if (prev != NULL)
+		{
+		  prev->next = p->next;
+		  p->next = *list;
+		  *list = p;
+		}
+
+	      return p;
+	    }
+	}
+
+      prev = p;
+    }
+
+  return NULL;
+}
+
+
+
+const char *
+hash_insert (struct hash_control *table, const char *key, int key_len, void *val)
+{
+  struct hash_entry *p;
+  struct hash_entry **list;
+  unsigned long hash;
+
+  if(key_len <= 0)
+	p = hash_lookup (table, key, strlen (key), &list, &hash);
+  else
+  	p = hash_lookup (table, key, key_len, &list, &hash);
+
+  if (p != NULL)
+    return "exists";
+
+#ifdef HASH_STATISTICS
+  ++table->insertions;
+#endif
+
+  p = (struct hash_entry *) obstack_alloc (&table->memory, sizeof (*p));
+//  p = (struct hash_entry *) XMALLOC (MTYPE_WIPS_DEBUG_HASH_NODE,sizeof (struct hash_entry));
+  p->string = key;
+  p->hash = hash;
+  p->data = val;
+
+  p->next = *list;
+  *list = p;
+
+  return NULL;
+}
+
+
+
+#endif
 
