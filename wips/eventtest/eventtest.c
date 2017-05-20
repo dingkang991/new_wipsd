@@ -1,6 +1,7 @@
 #include <stdio.h>
 /*以下两个头文件必须引用*/
 #include "eventtest.h"
+#include "api.h"
 #include "memory.h"
 
 /*事件:检测ap上线,并输出bssid*/
@@ -11,7 +12,8 @@ void* pBeaconTest(core2EventLib_t * tmp);
 void* pDataTest(core2EventLib_t * tmp);
 void* getEventReturn(void);
 void wNodeCreateCB(void*,int);
-void wNodeDestoryCB(void*,int);
+void wNodeDestoryCB(void*,void*,int);
+extern int eventReport (eventInfo_t *e);
 
 /*内存检测模块使用,必须引用*/
 extern memstat mstat[MODULE_MAX]; 
@@ -102,6 +104,15 @@ void* initTest(void)
 {
 
 	log_debug("at libtest.so func(init_test) test\n");
+	int ret=0;
+	
+	eventReport_t tmp;
+	memset(&tmp,0,sizeof(eventReport_t));
+	sprintf(tmp.mac,"%s","11:11:11:11:11:11");
+	sprintf(tmp.eventDesc,"ap(%s) upline\n","11:11:11:11:11:11");
+	tmp.eventId = LIBEVENT_TEST_ID;
+	ret = eventReport (&tmp);
+	log_debug("event report over ret:%s\n",ret);
 	return NULL;
 }
 #if 0
@@ -124,11 +135,20 @@ void wNodeCreateCB(void* ptr,int len)
 	log_info("wNodeCreate CB,ptr = %p len:%d\n",ptr,len);
 	return;
 }
-void wNodeDestoryCB(void* ptr,int len)
+void wNodeDestoryCB(void *node,void* ptr,int len)
 {
 	log_info("wNode Destory CB,ptr = %p len:%d\n",ptr,len);
 	int *flag = (int*) ptr;
+	wNode_t *node_tmp = node;
+	
+	eventReport_t tmp;
 	log_info("wNode Destory CB, flag:%d\n",*flag);
+	
+	memset(&tmp,0,sizeof(eventReport_t));
+	sprintf(tmp.mac,"%s",MAC2STR(node_tmp->mac));
+	sprintf(tmp.eventDesc,"ap(%s) offline\n",MAC2STR(node_tmp->mac));
+	tmp.eventId = LIBEVENT_TEST_ID;
+	eventReport (&tmp);
 	return;
 }
 void* pBeaconTest(core2EventLib_t* tmp)/*检测函数，beacon帧回调函数*/
@@ -159,6 +179,12 @@ void* pBeaconTest(core2EventLib_t* tmp)/*检测函数，beacon帧回调函数*/
 	if(*flag == 0)
 	{
 		log_info("____________bssid :"MACSTR" upline\n",MAC2STR(bssid->mac));
+		eventReport_t tmp;
+		memset(&tmp,0,sizeof(eventReport_t));
+		sprintf(tmp.mac,"%s",MAC2STR(bssid->mac));
+		sprintf(tmp.eventDesc,"ap(%s) upline\n",MAC2STR(bssid->mac));
+		tmp.eventId = LIBEVENT_TEST_ID;
+		eventReport (&tmp);
 		*flag = 1;
 	}else{
 		log_info("____________bssid :"MACSTR" has been uplink\n",MAC2STR(bssid->mac));

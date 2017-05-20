@@ -2,8 +2,8 @@ CC      = gcc
 CFLAGS  += -rdynamic -DMAGIC_CH=abdd
 INCLUDEFLAGS += -I../include -I../../libubox
 LDPATH += -L../ -L../../libubox
-LDFLAGS += -ldl -lwips -lubox
-OBJS    = main.o wNode.o wipsInterface.o wipsd_parse.o time.o confread.o
+LDFLAGS += -ldl -lwips -lubox -lglib-2.0 -lthrift-1.0.0-dev -lthriftnb-1.0.0-dev -lthriftnb -lthrift -lthriftz -lgobject-2.0 -lthrift_c_glib -lssl -lcrypto -lrt -lpthread
+OBJS    = main.o wNode.o wipsInterface.o wipsd_parse.o time.o confread.o api.o gen-c_glib/api_types.o gen-c_glib/report_event_service.o
 TARGETS = wips 
 
 #.PHONY:all 

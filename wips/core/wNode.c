@@ -62,7 +62,7 @@ int destroyWnode(wNode_t* node,int is_free)
 		if(module == NULL)
 			continue;
 		if(module->eventLibInfo.wnodeMem.wNodeMemDestroyCB != NULL)
-			module->eventLibInfo.wnodeMem.wNodeMemDestroyCB((void*)node->memInfo.memStart+libModule->memOffset,libModule->memLen);
+			module->eventLibInfo.wnodeMem.wNodeMemDestroyCB((void*)node,(void*)node->memInfo.memStart+libModule->memOffset,libModule->memLen);
 	}
 	if(hash_delete(ctx.wNodeAllHash,node->macStr,ETH_STR_ALEN,1) == NULL)
 	{

@@ -23,6 +23,9 @@ typedef unsigned short          u16,_u16,__u16;
 typedef unsigned int            u32,_u32,__u32;
 typedef char 					s8;
 
+#define set_aligned_len8(len) \
+(len%8 == 0 ?len:(len/8+1)*8)
+
 
 #define get_unaligned(ptr)	\
 ({	\
