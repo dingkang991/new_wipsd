@@ -14,9 +14,20 @@ enum _ReportEventProperties
 {
   PROP_REPORT_EVENT_0,
   PROP_REPORT_EVENT_EVENT_ID,
+  PROP_REPORT_EVENT_EVENT_LIB_ID,
+  PROP_REPORT_EVENT_TIME_NOW,
+  PROP_REPORT_EVENT_EVENT_INFO,
   PROP_REPORT_EVENT_EVENT_DESC,
   PROP_REPORT_EVENT_MAC,
-  PROP_REPORT_EVENT_PEER_MAC
+  PROP_REPORT_EVENT_PEER_MAC,
+  PROP_REPORT_EVENT_PROBER_MAC,
+  PROP_REPORT_EVENT_PROBER_IP,
+  PROP_REPORT_EVENT_PROBER_PORT,
+  PROP_REPORT_EVENT_CHANNEL,
+  PROP_REPORT_EVENT_SIGNAL,
+  PROP_REPORT_EVENT_BAND,
+  PROP_REPORT_EVENT_SSID,
+  PROP_REPORT_EVENT_BSSID
 };
 
 /* reads a report_event object */
@@ -82,6 +93,51 @@ report_event_read (ThriftStruct *object, ThriftProtocol *protocol, GError **erro
         }
         break;
       case 2:
+        if (ftype == T_I16)
+        {
+          if ((ret = thrift_protocol_read_i16 (protocol, &this_object->eventLibId, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_eventLibId = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 3:
+        if (ftype == T_I64)
+        {
+          if ((ret = thrift_protocol_read_i64 (protocol, &this_object->timeNow, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_timeNow = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 4:
+        if (ftype == T_STRING)
+        {
+          if (this_object->eventInfo != NULL)
+          {
+            g_free(this_object->eventInfo);
+            this_object->eventInfo = NULL;
+          }
+
+          if ((ret = thrift_protocol_read_string (protocol, &this_object->eventInfo, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_eventInfo = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 5:
         if (ftype == T_STRING)
         {
           if (this_object->eventDesc != NULL)
@@ -100,7 +156,7 @@ report_event_read (ThriftStruct *object, ThriftProtocol *protocol, GError **erro
           xfer += ret;
         }
         break;
-      case 3:
+      case 6:
         if (ftype == T_STRING)
         {
           if (this_object->mac != NULL)
@@ -119,7 +175,7 @@ report_event_read (ThriftStruct *object, ThriftProtocol *protocol, GError **erro
           xfer += ret;
         }
         break;
-      case 4:
+      case 7:
         if (ftype == T_STRING)
         {
           if (this_object->peerMac != NULL)
@@ -132,6 +188,140 @@ report_event_read (ThriftStruct *object, ThriftProtocol *protocol, GError **erro
             return -1;
           xfer += ret;
           this_object->__isset_peerMac = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 8:
+        if (ftype == T_STRING)
+        {
+          if (this_object->proberMac != NULL)
+          {
+            g_free(this_object->proberMac);
+            this_object->proberMac = NULL;
+          }
+
+          if ((ret = thrift_protocol_read_string (protocol, &this_object->proberMac, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_proberMac = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 9:
+        if (ftype == T_STRING)
+        {
+          if (this_object->proberIp != NULL)
+          {
+            g_free(this_object->proberIp);
+            this_object->proberIp = NULL;
+          }
+
+          if ((ret = thrift_protocol_read_string (protocol, &this_object->proberIp, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_proberIp = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 10:
+        if (ftype == T_STRING)
+        {
+          if (this_object->proberPort != NULL)
+          {
+            g_free(this_object->proberPort);
+            this_object->proberPort = NULL;
+          }
+
+          if ((ret = thrift_protocol_read_string (protocol, &this_object->proberPort, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_proberPort = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 11:
+        if (ftype == T_I16)
+        {
+          if ((ret = thrift_protocol_read_i16 (protocol, &this_object->channel, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_channel = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 12:
+        if (ftype == T_I16)
+        {
+          if ((ret = thrift_protocol_read_i16 (protocol, &this_object->signal, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_signal = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 13:
+        if (ftype == T_I16)
+        {
+          if ((ret = thrift_protocol_read_i16 (protocol, &this_object->band, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_band = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 14:
+        if (ftype == T_STRING)
+        {
+          if (this_object->ssid != NULL)
+          {
+            g_free(this_object->ssid);
+            this_object->ssid = NULL;
+          }
+
+          if ((ret = thrift_protocol_read_string (protocol, &this_object->ssid, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_ssid = TRUE;
+        } else {
+          if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
+            return -1;
+          xfer += ret;
+        }
+        break;
+      case 15:
+        if (ftype == T_STRING)
+        {
+          if (this_object->bssid != NULL)
+          {
+            g_free(this_object->bssid);
+            this_object->bssid = NULL;
+          }
+
+          if ((ret = thrift_protocol_read_string (protocol, &this_object->bssid, error)) < 0)
+            return -1;
+          xfer += ret;
+          this_object->__isset_bssid = TRUE;
         } else {
           if ((ret = thrift_protocol_skip (protocol, ftype, error)) < 0)
             return -1;
@@ -177,7 +367,37 @@ report_event_write (ThriftStruct *object, ThriftProtocol *protocol, GError **err
   if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
     return -1;
   xfer += ret;
-  if ((ret = thrift_protocol_write_field_begin (protocol, "eventDesc", T_STRING, 2, error)) < 0)
+  if ((ret = thrift_protocol_write_field_begin (protocol, "eventLibId", T_I16, 2, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_i16 (protocol, this_object->eventLibId, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "timeNow", T_I64, 3, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_i64 (protocol, this_object->timeNow, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "eventInfo", T_STRING, 4, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_string (protocol, this_object->eventInfo, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "eventDesc", T_STRING, 5, error)) < 0)
     return -1;
   xfer += ret;
   if ((ret = thrift_protocol_write_string (protocol, this_object->eventDesc, error)) < 0)
@@ -187,7 +407,7 @@ report_event_write (ThriftStruct *object, ThriftProtocol *protocol, GError **err
   if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
     return -1;
   xfer += ret;
-  if ((ret = thrift_protocol_write_field_begin (protocol, "mac", T_STRING, 3, error)) < 0)
+  if ((ret = thrift_protocol_write_field_begin (protocol, "mac", T_STRING, 6, error)) < 0)
     return -1;
   xfer += ret;
   if ((ret = thrift_protocol_write_string (protocol, this_object->mac, error)) < 0)
@@ -197,10 +417,90 @@ report_event_write (ThriftStruct *object, ThriftProtocol *protocol, GError **err
   if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
     return -1;
   xfer += ret;
-  if ((ret = thrift_protocol_write_field_begin (protocol, "peerMac", T_STRING, 4, error)) < 0)
+  if ((ret = thrift_protocol_write_field_begin (protocol, "peerMac", T_STRING, 7, error)) < 0)
     return -1;
   xfer += ret;
   if ((ret = thrift_protocol_write_string (protocol, this_object->peerMac, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "proberMac", T_STRING, 8, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_string (protocol, this_object->proberMac, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "proberIp", T_STRING, 9, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_string (protocol, this_object->proberIp, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "proberPort", T_STRING, 10, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_string (protocol, this_object->proberPort, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "channel", T_I16, 11, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_i16 (protocol, this_object->channel, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "signal", T_I16, 12, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_i16 (protocol, this_object->signal, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "band", T_I16, 13, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_i16 (protocol, this_object->band, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "ssid", T_STRING, 14, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_string (protocol, this_object->ssid, error)) < 0)
+    return -1;
+  xfer += ret;
+
+  if ((ret = thrift_protocol_write_field_end (protocol, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_field_begin (protocol, "bssid", T_STRING, 15, error)) < 0)
+    return -1;
+  xfer += ret;
+  if ((ret = thrift_protocol_write_string (protocol, this_object->bssid, error)) < 0)
     return -1;
   xfer += ret;
 
@@ -232,6 +532,23 @@ report_event_set_property (GObject *object,
       self->__isset_eventId = TRUE;
       break;
 
+    case PROP_REPORT_EVENT_EVENT_LIB_ID:
+      self->eventLibId = g_value_get_int (value);
+      self->__isset_eventLibId = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_TIME_NOW:
+      self->timeNow = g_value_get_int64 (value);
+      self->__isset_timeNow = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_EVENT_INFO:
+      if (self->eventInfo != NULL)
+        g_free (self->eventInfo);
+      self->eventInfo = g_value_dup_string (value);
+      self->__isset_eventInfo = TRUE;
+      break;
+
     case PROP_REPORT_EVENT_EVENT_DESC:
       if (self->eventDesc != NULL)
         g_free (self->eventDesc);
@@ -251,6 +568,56 @@ report_event_set_property (GObject *object,
         g_free (self->peerMac);
       self->peerMac = g_value_dup_string (value);
       self->__isset_peerMac = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_PROBER_MAC:
+      if (self->proberMac != NULL)
+        g_free (self->proberMac);
+      self->proberMac = g_value_dup_string (value);
+      self->__isset_proberMac = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_PROBER_IP:
+      if (self->proberIp != NULL)
+        g_free (self->proberIp);
+      self->proberIp = g_value_dup_string (value);
+      self->__isset_proberIp = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_PROBER_PORT:
+      if (self->proberPort != NULL)
+        g_free (self->proberPort);
+      self->proberPort = g_value_dup_string (value);
+      self->__isset_proberPort = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_CHANNEL:
+      self->channel = g_value_get_int (value);
+      self->__isset_channel = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_SIGNAL:
+      self->signal = g_value_get_int (value);
+      self->__isset_signal = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_BAND:
+      self->band = g_value_get_int (value);
+      self->__isset_band = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_SSID:
+      if (self->ssid != NULL)
+        g_free (self->ssid);
+      self->ssid = g_value_dup_string (value);
+      self->__isset_ssid = TRUE;
+      break;
+
+    case PROP_REPORT_EVENT_BSSID:
+      if (self->bssid != NULL)
+        g_free (self->bssid);
+      self->bssid = g_value_dup_string (value);
+      self->__isset_bssid = TRUE;
       break;
 
     default:
@@ -273,6 +640,18 @@ report_event_get_property (GObject *object,
       g_value_set_int (value, self->eventId);
       break;
 
+    case PROP_REPORT_EVENT_EVENT_LIB_ID:
+      g_value_set_int (value, self->eventLibId);
+      break;
+
+    case PROP_REPORT_EVENT_TIME_NOW:
+      g_value_set_int64 (value, self->timeNow);
+      break;
+
+    case PROP_REPORT_EVENT_EVENT_INFO:
+      g_value_set_string (value, self->eventInfo);
+      break;
+
     case PROP_REPORT_EVENT_EVENT_DESC:
       g_value_set_string (value, self->eventDesc);
       break;
@@ -283,6 +662,38 @@ report_event_get_property (GObject *object,
 
     case PROP_REPORT_EVENT_PEER_MAC:
       g_value_set_string (value, self->peerMac);
+      break;
+
+    case PROP_REPORT_EVENT_PROBER_MAC:
+      g_value_set_string (value, self->proberMac);
+      break;
+
+    case PROP_REPORT_EVENT_PROBER_IP:
+      g_value_set_string (value, self->proberIp);
+      break;
+
+    case PROP_REPORT_EVENT_PROBER_PORT:
+      g_value_set_string (value, self->proberPort);
+      break;
+
+    case PROP_REPORT_EVENT_CHANNEL:
+      g_value_set_int (value, self->channel);
+      break;
+
+    case PROP_REPORT_EVENT_SIGNAL:
+      g_value_set_int (value, self->signal);
+      break;
+
+    case PROP_REPORT_EVENT_BAND:
+      g_value_set_int (value, self->band);
+      break;
+
+    case PROP_REPORT_EVENT_SSID:
+      g_value_set_string (value, self->ssid);
+      break;
+
+    case PROP_REPORT_EVENT_BSSID:
+      g_value_set_string (value, self->bssid);
       break;
 
     default:
@@ -298,12 +709,34 @@ report_event_instance_init (ReportEvent * object)
   THRIFT_UNUSED_VAR (object);
   object->eventId = 0;
   object->__isset_eventId = FALSE;
+  object->eventLibId = 0;
+  object->__isset_eventLibId = FALSE;
+  object->timeNow = 0;
+  object->__isset_timeNow = FALSE;
+  object->eventInfo = NULL;
+  object->__isset_eventInfo = FALSE;
   object->eventDesc = NULL;
   object->__isset_eventDesc = FALSE;
   object->mac = NULL;
   object->__isset_mac = FALSE;
   object->peerMac = NULL;
   object->__isset_peerMac = FALSE;
+  object->proberMac = NULL;
+  object->__isset_proberMac = FALSE;
+  object->proberIp = NULL;
+  object->__isset_proberIp = FALSE;
+  object->proberPort = NULL;
+  object->__isset_proberPort = FALSE;
+  object->channel = 0;
+  object->__isset_channel = FALSE;
+  object->signal = 0;
+  object->__isset_signal = FALSE;
+  object->band = 0;
+  object->__isset_band = FALSE;
+  object->ssid = NULL;
+  object->__isset_ssid = FALSE;
+  object->bssid = NULL;
+  object->__isset_bssid = FALSE;
 }
 
 static void 
@@ -313,6 +746,11 @@ report_event_finalize (GObject *object)
 
   /* satisfy -Wall in case we don't use tobject */
   THRIFT_UNUSED_VAR (tobject);
+  if (tobject->eventInfo != NULL)
+  {
+    g_free(tobject->eventInfo);
+    tobject->eventInfo = NULL;
+  }
   if (tobject->eventDesc != NULL)
   {
     g_free(tobject->eventDesc);
@@ -327,6 +765,31 @@ report_event_finalize (GObject *object)
   {
     g_free(tobject->peerMac);
     tobject->peerMac = NULL;
+  }
+  if (tobject->proberMac != NULL)
+  {
+    g_free(tobject->proberMac);
+    tobject->proberMac = NULL;
+  }
+  if (tobject->proberIp != NULL)
+  {
+    g_free(tobject->proberIp);
+    tobject->proberIp = NULL;
+  }
+  if (tobject->proberPort != NULL)
+  {
+    g_free(tobject->proberPort);
+    tobject->proberPort = NULL;
+  }
+  if (tobject->ssid != NULL)
+  {
+    g_free(tobject->ssid);
+    tobject->ssid = NULL;
+  }
+  if (tobject->bssid != NULL)
+  {
+    g_free(tobject->bssid);
+    tobject->bssid = NULL;
   }
 }
 
@@ -356,6 +819,37 @@ report_event_class_init (ReportEventClass * cls)
 
   g_object_class_install_property
     (gobject_class,
+     PROP_REPORT_EVENT_EVENT_LIB_ID,
+     g_param_spec_int ("eventLibId",
+                       NULL,
+                       NULL,
+                       G_MININT16,
+                       G_MAXINT16,
+                       0,
+                       G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_TIME_NOW,
+     g_param_spec_int64 ("timeNow",
+                         NULL,
+                         NULL,
+                         G_MININT64,
+                         G_MAXINT64,
+                         0,
+                         G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_EVENT_INFO,
+     g_param_spec_string ("eventInfo",
+                          NULL,
+                          NULL,
+                          NULL,
+                          G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
      PROP_REPORT_EVENT_EVENT_DESC,
      g_param_spec_string ("eventDesc",
                           NULL,
@@ -376,6 +870,84 @@ report_event_class_init (ReportEventClass * cls)
     (gobject_class,
      PROP_REPORT_EVENT_PEER_MAC,
      g_param_spec_string ("peerMac",
+                          NULL,
+                          NULL,
+                          NULL,
+                          G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_PROBER_MAC,
+     g_param_spec_string ("proberMac",
+                          NULL,
+                          NULL,
+                          NULL,
+                          G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_PROBER_IP,
+     g_param_spec_string ("proberIp",
+                          NULL,
+                          NULL,
+                          NULL,
+                          G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_PROBER_PORT,
+     g_param_spec_string ("proberPort",
+                          NULL,
+                          NULL,
+                          NULL,
+                          G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_CHANNEL,
+     g_param_spec_int ("channel",
+                       NULL,
+                       NULL,
+                       G_MININT16,
+                       G_MAXINT16,
+                       0,
+                       G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_SIGNAL,
+     g_param_spec_int ("signal",
+                       NULL,
+                       NULL,
+                       G_MININT16,
+                       G_MAXINT16,
+                       0,
+                       G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_BAND,
+     g_param_spec_int ("band",
+                       NULL,
+                       NULL,
+                       G_MININT16,
+                       G_MAXINT16,
+                       0,
+                       G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_SSID,
+     g_param_spec_string ("ssid",
+                          NULL,
+                          NULL,
+                          NULL,
+                          G_PARAM_READWRITE));
+
+  g_object_class_install_property
+    (gobject_class,
+     PROP_REPORT_EVENT_BSSID,
+     g_param_spec_string ("bssid",
                           NULL,
                           NULL,
                           NULL,

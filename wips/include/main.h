@@ -45,6 +45,8 @@ struct wipsContext{
 	struct list_head wNodeBSS;
 	struct list_head wNodeSta;
 	struct hash_control *wNodeAllHash;
+	char serverIp[SERVER_IP_STR_LEN];
+	int serverPort;
 	int againgTime;
 	int traversalTime;
 	time_t timeNow;

@@ -21,6 +21,9 @@
 #include "gen-c_glib/api_types.h"
 #include "common.h"
 #include "api.h"
+#include "main.h"
+extern 
+	struct wipsContext ctx;
 #if 1
 ThriftProtocol *
 get_multiplexed_protocol(gchar *protocol_name, ThriftTransport *transport, gchar *service_name)
@@ -65,8 +68,8 @@ int eventReport (eventReport_t *e)
 #endif
 
   socket    = g_object_new (THRIFT_TYPE_SOCKET,
-                            "hostname",  "192.168.0.30",
-                            "port",      9091,
+                            "hostname",  ctx.serverIp,
+                            "port",      ctx.serverPort,
                             NULL);
   transport = g_object_new (THRIFT_TYPE_FRAMED_TRANSPORT,
                             "transport", socket,
@@ -91,14 +94,48 @@ int eventReport (eventReport_t *e)
                          "input_protocol",  protocol,
                          "output_protocol", protocol,
                          NULL);
+  char macStrTmp[ETH_STR_ALEN];
+  memset(&macStrTmp,0,ETH_STR_ALEN);
+  snprintf(macStrTmp,MACSTR,MAC2STR(e->node->proberInfo.proberMac));
 
-  
-  eventOut = g_object_new (TYPE_REPORT_EVENT,
-							 "eventId", e->eventId,
-							 "eventDesc",		  e->eventDesc,
-							 "mac",		 e->mac,
-							 "peerMac",	   e->peerMac,
-							 NULL);
+  if(e->node && e->nodeP)
+  {
+	  eventOut = g_object_new (TYPE_REPORT_EVENT,
+								 "eventId", e->eventId,
+								 "eventDesc",		  e->eventDesc,
+								 "mac",		 e->node->macStr,
+								 "peerMac",	   e->nodeP->macStr,
+								 "eventLibId", e->eventLib->eventInfo.eventId,
+								 "timeNow",		ctx.timeNow,
+								 "eventInfo",	e->eventInfo,
+								 "proberMac",		macStrTmp,
+								 "proberPort", 	e->node->proberInfo.addr.sin_port,
+								 "proberIp",(e->node->proberInfo.addr.sin_addr),
+								 "channel",e->node->radioInfo.channel,
+								 "band",e->node->radioInfo.band,
+								 "signal",e->node->radioInfo.signal,
+								 "ssid","NULL",
+								 "bssid","NULL",
+								 NULL);
+	}else{
+	
+	eventOut = g_object_new (TYPE_REPORT_EVENT,
+							   "eventId", e->eventId,
+							   "eventDesc", 		e->eventDesc,
+							   "mac",	   e->node->macStr,
+								"eventLibId", e->eventLib->eventInfo.eventId,
+								"timeNow",	   ctx.timeNow,
+								"eventInfo",   e->eventInfo,
+								"proberMac",	   macStrTmp,
+								"proberPort",  e->node->proberInfo.addr.sin_port,
+								"proberIp",(e->node->proberInfo.addr.sin_addr),
+								"channel",e->node->radioInfo.channel,
+								"band",e->node->radioInfo.band,
+								"signal",e->node->radioInfo.signal,
+								"ssid","NULL",
+								"bssid","NULL",
+							   NULL);
+}								 
 
   if (report_event_service_if_report (client,
 										 eventOut,

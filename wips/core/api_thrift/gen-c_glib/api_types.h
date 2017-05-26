@@ -24,12 +24,34 @@ struct _ReportEvent
   /* public */
   gint16 eventId;
   gboolean __isset_eventId;
+  gint16 eventLibId;
+  gboolean __isset_eventLibId;
+  gint64 timeNow;
+  gboolean __isset_timeNow;
+  gchar * eventInfo;
+  gboolean __isset_eventInfo;
   gchar * eventDesc;
   gboolean __isset_eventDesc;
   gchar * mac;
   gboolean __isset_mac;
   gchar * peerMac;
   gboolean __isset_peerMac;
+  gchar * proberMac;
+  gboolean __isset_proberMac;
+  gchar * proberIp;
+  gboolean __isset_proberIp;
+  gchar * proberPort;
+  gboolean __isset_proberPort;
+  gint16 channel;
+  gboolean __isset_channel;
+  gint16 signal;
+  gboolean __isset_signal;
+  gint16 band;
+  gboolean __isset_band;
+  gchar * ssid;
+  gboolean __isset_ssid;
+  gchar * bssid;
+  gboolean __isset_bssid;
 };
 typedef struct _ReportEvent ReportEvent;
 

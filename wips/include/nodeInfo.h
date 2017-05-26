@@ -50,6 +50,7 @@ typedef struct w_node
 {
 	__u8 mac[ETH_ALEN];
 	char macStr[ETH_STR_ALEN];
+	int nodeType;
 	int initFlag;
 	time_t upTime;
 	time_t lastTime;

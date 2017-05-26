@@ -106,13 +106,22 @@ void* initTest(void)
 	log_debug("at libtest.so func(init_test) test\n");
 	int ret=0;
 	
+	#if 1
+	wNode_t node;
 	eventReport_t tmp;
 	memset(&tmp,0,sizeof(eventReport_t));
-	sprintf(tmp.mac,"%s","11:11:11:11:11:11");
+	sprintf(node.macStr,"%s","11:11:11:11:11:11");
+	tmp.node=&node;
+	tmp.eventLib = &eventLibInfo;
 	sprintf(tmp.eventDesc,"ap(%s) upline\n","11:11:11:11:11:11");
 	tmp.eventId = LIBEVENT_TEST_ID;
 	ret = eventReport (&tmp);
 	log_debug("event report over ret:%s\n",ret);
+
+	time_t t;
+	time(&t);
+	log_debug("time:%ld,sizeof(time_t):%d\n",t,sizeof(time_t));
+	#endif
 	return NULL;
 }
 #if 0
@@ -145,8 +154,8 @@ void wNodeDestoryCB(void *node,void* ptr,int len)
 	log_info("wNode Destory CB, flag:%d\n",*flag);
 	
 	memset(&tmp,0,sizeof(eventReport_t));
-	sprintf(tmp.mac,"%s",MAC2STR(node_tmp->mac));
-	sprintf(tmp.eventDesc,"ap(%s) offline\n",MAC2STR(node_tmp->mac));
+	tmp.node = node;
+	sprintf(tmp.eventDesc,"ap("MACSTR") offline\n",MAC2STR(node_tmp->mac));
 	tmp.eventId = LIBEVENT_TEST_ID;
 	eventReport (&tmp);
 	return;
@@ -181,8 +190,8 @@ void* pBeaconTest(core2EventLib_t* tmp)/*检测函数，beacon帧回调函数*/
 		log_info("____________bssid :"MACSTR" upline\n",MAC2STR(bssid->mac));
 		eventReport_t tmp;
 		memset(&tmp,0,sizeof(eventReport_t));
-		sprintf(tmp.mac,"%s",MAC2STR(bssid->mac));
-		sprintf(tmp.eventDesc,"ap(%s) upline\n",MAC2STR(bssid->mac));
+		tmp.node = bssid;
+		sprintf(tmp.eventDesc,"ap("MACSTR") upline\n",MAC2STR(bssid->mac));
 		tmp.eventId = LIBEVENT_TEST_ID;
 		eventReport (&tmp);
 		*flag = 1;

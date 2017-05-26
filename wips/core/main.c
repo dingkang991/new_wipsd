@@ -660,10 +660,34 @@ void loadBaseConfig()
 	if(configValue == NULL)
 	{
 		log_error("can not load config key(%s) ,load default 60\n","travelsalTime");
-		ctx.againgTime = 60;
+		ctx.traversalTime = 60;
 	}else{
 		log_info("find key(%s),value(%s)\n","travelsalTime",configValue);
 		sscanf(configValue,"%d",&ctx.traversalTime);
+	}
+
+	
+	/*****thrift server ip******/
+	configValue = confread_find_value(root,"serverIp");
+	if(configValue == NULL)
+	{
+		log_error("can not load config key(%s) ,load default localhost\n","serverIp");
+		snprintf(ctx.serverIp,SERVER_IP_STR_LEN,"%s","localhost");
+	}else{
+		log_info("find key(%s),value(%s)\n","serverIp",configValue);
+		sscanf(configValue,"%s",ctx.serverIp);
+	}
+
+	
+	/*****thrift server ip******/
+	configValue = confread_find_value(root,"serverPort");
+	if(configValue == NULL)
+	{
+		log_error("can not load config key(%s) ,load default 9091\n","serverPort");
+		ctx.serverPort = 9091;
+	}else{
+		log_info("find key(%s),value(%s)\n","serverPort",configValue);
+		sscanf(configValue,"%d",&ctx.serverPort);
 	}
 
 	return;
@@ -738,7 +762,11 @@ void main(int argc ,char** argv)
 					log_error("Config(%s) open failed\n",optarg);
 					return -1;
 			}
+			
+			log_info("----------------stage(load config)-----------------\n");
 			loadBaseConfig();
+			
+			log_info("----------------stage(load config)-----------------\n");
 			loadAllModules();
 			
 			break;

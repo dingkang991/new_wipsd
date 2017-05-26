@@ -17,6 +17,10 @@
 #define SSID_BUFSIZE_D	(SSID_BUFSIZE+1)
 #define ETH_ALEN 6
 #define ETH_STR_ALEN 18
+#define SERVER_IP_STR_LEN 16
+#define SERVER_PORT_STR_LEN 8
+#define DESCSTRLEN 512
+
 
 typedef unsigned char           u8,_u8,__u8;
 typedef unsigned short          u16,_u16,__u16;
