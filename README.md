@@ -1,4 +1,4 @@
-1.install json-c
+1.install json-c 
  sh autegen.sh
  ./configure
  make

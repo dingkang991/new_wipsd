@@ -467,7 +467,7 @@ int parseCB2CTX(eventLibLinkInfo_t* tmp)
 	return 0;
 }
 		
-eventLibLinkInfo_t* insmodModule(char* path)
+eventLibLinkInfo_t* insmodModule(struct confread_section *path)
 {
 	INIT_CB_FUNC func;
 	eventLibInfo_t *eventLibInfoTmp=NULL;
@@ -480,12 +480,12 @@ eventLibLinkInfo_t* insmodModule(char* path)
 	
 	if(NULL == eventLibLinkInfoTmp)
 	{
-		log_error("new eventLibLinkInfo for \"%s\" is NULL\n",path);
+		log_error("new eventLibLinkInfo for \"%s\" is NULL\n",path->name);
 		return -1;
 	}
-	log_info("insmod module path:%s\t\n",path);
+	log_info("insmod module path:%s\t\n",path->name);
 
-	snprintf(eventLibLinkInfoTmp->eventLibAbsPath,EVENTLIB_ABS_PATH_MAX,"%s",path);
+	snprintf(eventLibLinkInfoTmp->eventLibAbsPath,EVENTLIB_ABS_PATH_MAX,"%s",path->name);
 	
 	func=invokeMethod(eventLibLinkInfoTmp);
 	
@@ -505,8 +505,16 @@ eventLibLinkInfo_t* insmodModule(char* path)
 	
 	//log_debug("get event lib name:%s\n",eventLibLinkInfoTmp->eventLibInfo.eventLibName);
 	//log_debug("run eventCB.eventCBInit\n");
-	eventLibLinkInfoTmp->eventLibInfo.eventCB.eventCBInit();
-
+	if(eventLibLinkInfoTmp->eventLibInfo.eventCB.eventCBInit != NULL){
+		char* configValue = NULL;
+		configValue = confread_find_value(path,"baseConfig");
+		if(configValue != NULL)
+		{
+			log_info("baseConfig (%s),for module (%s)\n",configValue,path->name);
+		}else{
+			log_info("baseConfig (%s),for modeule (%s)\n","null",path->name);
+		eventLibLinkInfoTmp->eventLibInfo.eventCB.eventCBInit(configValue);
+	}
 	list_add(&ctx.libEventList,&eventLibLinkInfoTmp->list);
 	parseCB2CTX(eventLibLinkInfoTmp);
 	parseWnodeInfo2CTX(eventLibLinkInfoTmp);
@@ -696,8 +704,8 @@ void loadBaseConfig()
 void loadAllModules()
 {
 	struct confread_section *thisSect = NULL;
-	
-	struct confread_pair *thisPair = 0;
+	struct confread_pair *thisPair = NULL;
+	char* configValue = NULL;
 	if(ctx.configFile == NULL)
 	{
 		log_error("config file is NULL\n");
@@ -710,7 +718,7 @@ void loadAllModules()
 		int ret = 0;
 		log_info("load wips module[%s]\n",thisSect->name);
 		
-		ret = insmodModule(thisSect->name);
+		ret = insmodModule(thisSect);
 
 		if(ret != 0)
 		{

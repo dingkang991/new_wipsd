@@ -7,7 +7,7 @@
 /*事件:检测ap上线,并输出bssid*/
 
 /*事件内处理函数的声明*/
-void* initTest(void);
+void* initTest(char*);
 void* pBeaconTest(core2EventLib_t * tmp);
 void* pDataTest(core2EventLib_t * tmp);
 void* getEventReturn(void);
@@ -100,10 +100,10 @@ void* EventLibInfoReturn(void)/*固定必须这么写，函数名不能动，实
 	;
 	return (void*)&eventLibInfo;
 }
-void* initTest(void)
+void* initTest(char* baseConfig)
 {
 
-	log_debug("at libtest.so func(init_test) test\n");
+	log_debug("at libtest.so func(init_test) test and baseConfig is :%s\n",baseConfig);
 	int ret=0;
 	
 	#if 1
@@ -115,7 +115,7 @@ void* initTest(void)
 	tmp.eventLib = &eventLibInfo;
 	sprintf(tmp.eventDesc,"ap(%s) upline\n","11:11:11:11:11:11");
 	tmp.eventId = LIBEVENT_TEST_ID;
-	ret = eventReport (&tmp);
+	//ret = eventReport (&tmp);
 	log_debug("event report over ret:%s\n",ret);
 
 	time_t t;
