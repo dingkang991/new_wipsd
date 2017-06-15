@@ -4,10 +4,22 @@
 #include "api.h"
 #include "memory.h"
 
+#include <thrift/c_glib/thrift.h>
+#include <thrift/c_glib/protocol/thrift_binary_protocol_factory.h>
+#include <thrift/c_glib/protocol/thrift_protocol_factory.h>
+#include <thrift/c_glib/server/thrift_server.h>
+#include <thrift/c_glib/server/thrift_simple_server.h>
+#include <thrift/c_glib/transport/thrift_buffered_transport_factory.h>
+#include <thrift/c_glib/transport/thrift_server_socket.h>
+#include <thrift/c_glib/transport/thrift_server_transport.h>
+#include "gen-c_glib/calculator.h"
+
+
 /*事件:检测ap上线,并输出bssid*/
 
 /*事件内处理函数的声明*/
-void* initTest(char*);
+
+void* initTest(char* baseConfig,CalculatorHandlerClass *handler);
 void* pBeaconTest(core2EventLib_t * tmp);
 void* pDataTest(core2EventLib_t * tmp);
 void* getEventReturn(void);
@@ -100,10 +112,65 @@ void* EventLibInfoReturn(void)/*固定必须这么写，函数名不能动，实
 	;
 	return (void*)&eventLibInfo;
 }
-void* initTest(char* baseConfig)
+int reportTime;
+static gboolean
+tutorial_calculator_handler_setReport (CalculatorIf  *iface,
+                                 gint32        *_return,
+								 const gint32	logTypeNew,
+                                 GError       **error)
+{
+  THRIFT_UNUSED_VAR (iface);
+  THRIFT_UNUSED_VAR (error);
+
+log_info("old reportTime:%d,set to :%d\n",reportTime,logTypeNew);
+	reportTime = logTypeNew;
+  *_return = reportTime;
+
+  return TRUE;
+}
+
+
+static gboolean
+tutorial_calculator_handler_getReport (CalculatorIf  *iface,
+                                 gint32        *_return,
+                                 GError       **error)
+{
+  THRIFT_UNUSED_VAR (iface);
+  THRIFT_UNUSED_VAR (error);
+
+log_info("old reportTime:%d,get it\n",reportTime);
+  *_return = reportTime;
+
+  return TRUE;
+}
+
+
+static gboolean
+eventTestHandler_ping (CalculatorIf  *iface,
+                                  GError       **error)
+{
+  THRIFT_UNUSED_VAR (iface);
+  THRIFT_UNUSED_VAR (error);
+
+  puts ("ping()");
+  log_debug("at libtest.so func(init_test) getn api infooooooooo \n");
+
+  return TRUE;
+}
+
+void* initTest(char* baseConfig,CalculatorHandlerClass *handler)
 {
 
-	log_debug("at libtest.so func(init_test) test and baseConfig is :%s\n",baseConfig);
+	log_debug("at libtest.so func(init_test) test and baseConfig is :%s handler:%p\n",baseConfig,handler);
+	if(handler != NULL)
+	{
+		log_debug("install handler\n");
+		handler->ping =eventTestHandler_ping;
+		handler->set_test_report = tutorial_calculator_handler_setReport;
+		
+		handler->get_test_report = tutorial_calculator_handler_getReport;
+	}
+		
 	int ret=0;
 	
 	#if 1

@@ -1,5 +1,5 @@
 CFLAGS  += -fPIC -shared -Dmagic_ch=124
-INCLUDEFLAGS += -I../include
+INCLUDEFLAGS += -I../include -I../
 LDPATH += -L../
 LDFLAGS += -lwips
 OBJS    = eventtest.o 

@@ -1,15 +1,34 @@
 #include <stdio.h>
 #include <dlfcn.h>
 #include <string.h>
+
+#include <thrift/c_glib/thrift.h>
+#include <thrift/c_glib/protocol/thrift_binary_protocol_factory.h>
+#include <thrift/c_glib/protocol/thrift_protocol_factory.h>
+#include <thrift/c_glib/server/thrift_server.h>
+#include <thrift/c_glib/server/thrift_simple_server.h>
+#include <thrift/c_glib/transport/thrift_buffered_transport_factory.h>
+#include <thrift/c_glib/transport/thrift_server_socket.h>
+#include <thrift/c_glib/transport/thrift_server_transport.h>
+#include "gen-c_glib/calculator.h"
+
+#include <pthread.h>
+
 #include "memory.h"
 #include "main.h"
 #include "nodeInfo.h"
 #include "wipsInterface.h"
 #include "confread.h"
 
+
+
 int logType1= 0xffffffff;
 int logType2= 0xffffffff;
 int logLevel = 0;
+extern CalculatorHandlerClass *calculator_handler_class_globle;
+extern int wips_server_init (void);
+extern ThriftServer *server;
+
 struct wipsContext ctx;
 
 
@@ -513,7 +532,8 @@ eventLibLinkInfo_t* insmodModule(struct confread_section *path)
 			log_info("baseConfig (%s),for module (%s)\n",configValue,path->name);
 		}else{
 			log_info("baseConfig (%s),for modeule (%s)\n","null",path->name);
-		eventLibLinkInfoTmp->eventLibInfo.eventCB.eventCBInit(configValue);
+		}
+		eventLibLinkInfoTmp->eventLibInfo.eventCB.eventCBInit(configValue,calculator_handler_class_globle);
 	}
 	list_add(&ctx.libEventList,&eventLibLinkInfoTmp->list);
 	parseCB2CTX(eventLibLinkInfoTmp);
@@ -602,7 +622,7 @@ core2EventLib_t* core2EventLibInit(core2EventLib_t* core2EventLib,eventLibLinkIn
 	return tmp;
 }
 
-MM_STATS(CORE_ID);
+//MM_STATS(CORE_ID);
 
 
 void loadBaseConfig()
@@ -739,6 +759,15 @@ void loadAllModules()
 	}
 }
 
+void* thrift_server(void* arg)
+{
+	GError *error = NULL;
+
+puts ("Starting the server...");
+thrift_server_serve (server, &error);
+return NULL;
+}
+
 void main(int argc ,char** argv)
 {
 	int ch;
@@ -771,6 +800,8 @@ void main(int argc ,char** argv)
 					return -1;
 			}
 			
+			log_info("----------------stage(wips_server_init start)-----------------\n");
+			wips_server_init();
 			log_info("----------------stage(load config)-----------------\n");
 			loadBaseConfig();
 			
@@ -781,67 +812,26 @@ void main(int argc ,char** argv)
 		default:
 			printf("other option :%c\n", ch);
 	}
-//	inorder_avltree(NULL);
+	
+	log_info("----------------stage(wips_server_init start222)-----------------\n");
+	
+//	puts ("Starting the server...");
+//	thrift_server_serve (server, &error);
+	log_info("----------------stage(wips_server_init stop)-----------------\n");
 
-	/*
-	printf("logType:%d\n",logType1);
-	printf("logType:%d\n",logType2);
-	printf("logLevel:%d\n",logLevel);
 
-	log_debug("logType1:%x\n",logType1);
-	log_debug("logType2:%x\n",logType2);
-	log_debug("logLevel:%x\n",logLevel);
-*/
-	eventLibLinkInfo_t* tmp;
-	uloop_init();/*
-	insmodModule("./libtest.so");
-	insmodModule("./libtest2.so");
-*/
-
-	log_error("----------------test code-----------------\n");
-	/*
+	int tmp;
+	pthread_t tid;
+	
+	if((tmp=pthread_create(&tid,NULL,thrift_server,NULL))!=0)
 	{
-	char beaconBuf[30]={0x80,0x00,0x0,0x0,0xff,0xff,0xff,0xff,0xff,0xff,\
-	0x11,0x11,0x11,0x11,0x11,0x11,\
-	0x11,0x11,0x11,0x11,0x11,0x11,\
-	0x00,0x00,\
-	0x22,0x22,0x22,0x22,0x22,0x22\
-	};
-	
-	core2EventLib_t info2Event;
-	//INIT_CORE2EVENTLIB_TMP(pBeacon);
-	memset(&info2Event,0,sizeof(core2EventLib_t));
-	info2Event.wNodeSta = NULL;
-	info2Event.wNodeBssid = NULL;
-	//info2Event.proberInfo.fd = fd;
-	freshTime();
-	wipsd_handle_wlansniffrm(beaconBuf, 30, &info2Event);
-	
-	log_error("----------------test code again-----------------\n");
- 	wipsd_handle_wlansniffrm(beaconBuf, 30, &info2Event);
- 	log_error("_________________over______________________\n");
-	return 0;
-					
-}
-*/
-/*
-	wNode_t* tmpWnode = initWnode(NULL);
-	core2EventLib_t pBeacon,pData;
-	snprintf(pBeacon.tmpInfo,128,"Beacon packet will comming");
-	snprintf(pData.tmpInfo,128,"Data packet will comming");
-	pBeacon.wNodeBssid= tmpWnode ;
-	
-	handleAllCB(&ctx.pBeaconList,&pBeacon);
-	
-	handleAllCB(&ctx.pBeaconList,&pBeacon);
-	log_error("----------------split data-----------------\n");
-	handleAllCB(&ctx.pDataList,&pData);
-	log_error("++++++++++++++++++core  ++++++++++++++++++++\n");
+		log_error("start thrift_server error\n");
+	}
+	log_info("start thrift_server over\n");
+	uloop_init();
 
-	mm_stats(CORE_ID);
-	log_error("++++++++++++++++++core over+++++++++++++++++++++\n");
+	
 
-	*/
 	if(NULL ==setWipsInterface(&ctx.wipsInterface))
 	{
 		log_error("setWipsInterface error\n");
@@ -852,16 +842,9 @@ void main(int argc ,char** argv)
 		log_info("start uloop\n");
 		uloop_run();
 	}
-	/*
-	log_debug("log debug test\n");
-	log_info("log info test\n");
-	log_warn("log warn test\n");
-	log_error("log error test\n");
-	*/
 
-//	AVLTreeTest();
-//main_hash();
-	}
+
+}
 	
 	
 	

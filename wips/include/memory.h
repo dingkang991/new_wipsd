@@ -37,6 +37,7 @@ void mm_stats_tmp_ ## TYPE()\
 	log_debug("@          Total size: %8d bytes          @\n",mstat[LIBEVENT_TEST_ID].alloc_size);\
 	log_debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");\
 }
+
 #define mm_stats(TYPE) mm_stats_tmp_ ## TYPE()
 
 

@@ -14,6 +14,8 @@ lib:
 	sudo cp lib/libwips.so /lib
 	sudo cp lib/libwips.so .
 wips:
+	thrift -r --gen c_glib tutorial.thrift
+	cp gen-c_glib/ core/gen-c_glib_server/ -rf 
 	make -C core
 	cp core/wips .
 

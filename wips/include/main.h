@@ -6,6 +6,11 @@
 #include "wipsInterface.h"
 #include "log.h"
 
+#define log_info_ts(format,...) LOG("thriftS",CORE,0,LEVEL_INFO,format,  ##__VA_ARGS__)
+#define log_debug_ts(format,...) LOG("thriftS",CORE,0,LEVEL_DEBUG,format,  ##__VA_ARGS__)
+#define log_error_ts(format,...) LOG("thriftS",CORE,0,LEVEL_ERROR,format,  ##__VA_ARGS__)
+#define log_warn_ts(format,...) LOG("thriftS",CORE,0,LEVEL_WARN,format,  ##__VA_ARGS__)
+
 
 #define log_info(format,...) LOG("core",CORE,0,LEVEL_INFO,format,  ##__VA_ARGS__)
 #define log_debug(format,...) LOG("core",CORE,0,LEVEL_DEBUG,format,  ##__VA_ARGS__)
